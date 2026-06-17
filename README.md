@@ -1,8 +1,10 @@
 # CipherSentry SSH Honeypot
 
-Honeypot SSH ligero de código abierto. Acepta conexiones de atacantes, captura credenciales y metadatos, y delega toda la emulación de comandos en el **CipherSentry Shell API** — el cerebro privado del sistema.
+> *Convierte cada ataque en inteligencia.*
 
-> Este proyecto es el cliente público (MIT). El engine de emulación (70+ comandos, VFS Debian 12, pipelines, REPLs) no está incluido — vive en la Shell API.
+Honeypot SSH de código abierto que convierte conexiones de atacantes en inteligencia accionable: captura credenciales, sesiones y payloads, y los hace creíbles delegando la emulación en la **CipherSentry Shell API**.
+
+> Este repositorio es el sensor cliente (MIT). El engine de emulación (70+ comandos, VFS Debian 12, pipelines, REPLs) vive en la Shell API — no está incluido aquí.
 
 ---
 
@@ -62,9 +64,22 @@ bash node.sh enroll          # imprime tu código (p. ej. NODO-A1B2-C3D4-E5F6)
 # → entra/crea cuenta en el dashboard → El Enjambre → Añadir nodo → pega el código
 ```
 
-A partir de ahí el engine atribuye por `node_id`. **No tienes que configurar ninguna
-API key por cuenta**: el acceso a la Shell API usa una key de transporte compartida
-(`SHELL_API_KEY`, por defecto `free-demo`) que **no** es tu credencial ni fija tu tier.
+A partir de ahí, todas tus capturas aparecen en tu cuenta.
+
+---
+
+## Gestión del nodo
+
+Desde el directorio de instalación (`/opt/ciphersentry` por defecto):
+
+| Comando | Acción |
+|---------|--------|
+| `bash node.sh` | Estado: puerto, sesiones capturadas, Shell API alcanzable |
+| `bash node.sh up` | Arrancar el honeypot |
+| `bash node.sh down` | Parar el honeypot |
+| `bash node.sh logs` | Actividad en tiempo real |
+| `bash node.sh enroll` | Código para vincular este nodo a tu cuenta |
+| `bash node.sh test` | Probar la conexión a la Shell API |
 
 ---
 
@@ -72,7 +87,7 @@ API key por cuenta**: el acceso a la Shell API usa una key de transporte compart
 
 ### config.yaml
 
-El nodo viene **preconfigurado** y funciona desde el minuto cero sin tocar nada. El único campo que puede interesar cambiar es `shell_api_key` si quieres vincular las sesiones a tu cuenta.
+El nodo viene **preconfigurado** y funciona desde el minuto cero sin tocar nada. Para la mayoría de usos no hace falta editar este fichero — el instalador con `--key` y `node.sh enroll` cubren el resto.
 
 ```yaml
 # CipherSentry Honeypot Client — configuración
@@ -104,6 +119,7 @@ shell_api_url: "https://api.ciphersentry.yoire.com"
 # Tu API key de El Enjambre. Cámbiala por la tuya para que las sesiones aparezcan
 # en tu cuenta. Encuéntrala en: El Enjambre → Mi cuenta → API key.
 # Sin cambiarla las sesiones se capturan igualmente pero en modo anónimo.
+# Nota: "free-demo" es una clave compartida y pública — verla aquí es intencional.
 shell_api_key: "free-demo"
 ```
 
