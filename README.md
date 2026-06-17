@@ -12,7 +12,7 @@ Honeypot SSH ligero de código abierto. Acepta conexiones de atacantes, captura 
 Atacante
   │  SSH (puerto 2222)
   ▼
-ssh-honeypot-public      ← este proyecto (código abierto)
+ssh-honeypot-sensor      ← este proyecto (código abierto)
   · acepta conexión SSH
   · captura: IP, usuario, contraseña, cliente SSH
   · reenvía cada comando a la Shell API
@@ -31,20 +31,27 @@ CipherSentry Shell API   ← privado, no incluido
 
 ## Despliegue de un nodo nuevo
 
-Este es un repositorio independiente, así que basta clonarlo:
+Instalación en una línea — instala Docker si falta, descarga el sensor y lo arranca:
 
 ```bash
-git clone https://TU_TOKEN@github.com/m4ndingo/ssh-honeypot-public.git
-cd ssh-honeypot-public
-bash install.sh --docker -y          # instala Docker + construye imagen (o: bash install.sh → venv)
-bash node.sh up                      # arranca (elige puerto: 22 si libre, si no 2222)
-bash node.sh                         # estado, actividad y orientación
+curl -fsSL https://ciphersentry.yoire.com/install.sh | bash
 ```
 
-> `TU_TOKEN` es un PAT de GitHub con lectura del repo (privado).
+Para vincular el nodo a tu cuenta desde el inicio, pásale tu key:
+
+```bash
+curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --key <tu-key>
+```
+
+Tras instalar, gestiona el nodo con `node.sh` (desde el directorio de instalación):
+
+```bash
+bash node.sh up      # arranca (elige puerto: 22 si libre, si no 2222)
+bash node.sh         # estado, actividad y orientación
+```
 
 **Funciona desde el minuto cero:** el cliente viene con la Shell API central de
-CipherSentry preconfigurada, así que un nodo recién clonado ya emula comandos.
+CipherSentry preconfigurada, así que un nodo recién instalado ya emula comandos.
 
 **Vincular el nodo a tu cuenta (atribución):** la identidad del nodo es su `node_id`
 (se genera local; su clave privada nunca viaja). Para que tus capturas cuenten en tu
@@ -82,31 +89,15 @@ dashboard. Comandos: `node.sh status | up | down | logs | test | help`.
 
 Requiere **Python 3.9+**.
 
-```bash
-git clone <repo>
-cd ssh-honeypot-public
-```
+> **La forma recomendada de desplegar un nodo es el one-liner** de la sección
+> [«Despliegue de un nodo nuevo»](#despliegue-de-un-nodo-nuevo). Lo de abajo es para
+> instalación manual o desarrollo a partir del código fuente.
 
-### Opción recomendada: script de instalación
-
-`install.sh` automatiza todo el proceso: crea el entorno virtual, sortea el
-bloqueo PEP 668 (*externally-managed*), instala las dependencias y genera la
-host key si falta.
+Clona el repositorio:
 
 ```bash
-bash install.sh            # crea .venv/ e instala dependencias
-bash install.sh -y         # además instala python3-venv vía apt si falta
-bash install.sh --system   # instalación global (--break-system-packages, sin venv)
-bash install.sh --help     # todas las opciones
-```
-
-Si falta el paquete `python3-venv` (error `ensurepip is not available`), el script
-muestra el comando exacto a ejecutar; o instálalo automáticamente relanzando con `-y`.
-
-Al terminar, arranca con el Python del entorno virtual:
-
-```bash
-.venv/bin/python honeypot.py --port 2222 --verbose
+git clone https://github.com/cipher-sentry/ssh-honeypot-sensor.git
+cd ssh-honeypot-sensor
 ```
 
 ### Alternativa: pasos manuales (venv)
@@ -238,7 +229,7 @@ Este honeypot requiere una instancia de **CipherSentry Shell API** para funciona
 - Tier **Free** (10.000 comandos/mes): gratuito
 - Tiers de pago para despliegues con tráfico real
 
-Más información: [ciphersentry.io](https://ciphersentry.io)
+Más información: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
 
 ---
 
@@ -280,8 +271,7 @@ La cuarentena vive bajo `logs/` (no se sube a git; no se expone por SFTP).
 ## Compatibilidad con clientes SSH
 
 Probado con OpenSSH y con clientes móviles. La compatibilidad con **Termius (Android, libssh2)**
-requirió varios ajustes en el manejo de asyncssh; los detalles técnicos de cada bug y su
-corrección están documentados en [`BUGS.md`](BUGS.md). Puntos clave:
+requirió varios ajustes en el manejo de asyncssh. Puntos clave:
 
 - `keyboard-interactive` deshabilitado (asyncssh lo anuncia por defecto sin handler).
 - `ssh_version` sin prefijo `SSH-2.0-` (asyncssh ya lo añade).
