@@ -66,132 +66,45 @@ A partir de ahí el engine atribuye por `node_id`. **No tienes que configurar ni
 API key por cuenta**: el acceso a la Shell API usa una key de transporte compartida
 (`SHELL_API_KEY`, por defecto `free-demo`) que **no** es tu credencial ni fija tu tier.
 
-El cliente es ligero: delega *toda* la emulación en la Shell API. Para apuntar a
-**otra** Shell API (la tuya propia), crea un `.env` en este directorio — el
-`docker-compose` lo usa por encima de `config.yaml`:
-
-```bash
-cat > .env <<EOF
-SHELL_API_URL=http://IP_DE_TU_SHELL_API:8090
-EOF
-```
-
-`bash node.sh status` te dice si la Shell API es alcanzable. Debe serlo por red desde
-el nodo (idealmente VPN/TLS).
-
-`bash node.sh` muestra si el honeypot está corriendo, su puerto, las sesiones
-capturadas, si la **Shell API es alcanzable**, cómo probarlo y cómo verlo en el
-dashboard. Comandos: `node.sh status | up | down | logs | test | help`.
-
----
-
-## Instalación
-
-Requiere **Python 3.9+**.
-
-> **La forma recomendada de desplegar un nodo es el one-liner** de la sección
-> [«Despliegue de un nodo nuevo»](#despliegue-de-un-nodo-nuevo). Lo de abajo es para
-> instalación manual o desarrollo a partir del código fuente.
-
-Clona el repositorio:
-
-```bash
-git clone https://github.com/cipher-sentry/ssh-honeypot-sensor.git
-cd ssh-honeypot-sensor
-```
-
-### Alternativa: pasos manuales (venv)
-
-En distribuciones modernas (Debian 12+, Ubuntu 23.04+) Python está marcado como
-*externally-managed* (PEP 668) y un `pip install` directo falla con el error
-`externally-managed-environment`. La forma limpia de instalar las dependencias es
-con un entorno virtual:
-
-```bash
-# El paquete python3-venv puede no estar instalado. Si lo está, omite esta línea.
-# El error típico es: "ensurepip is not available ... apt install python3.13-venv"
-sudo apt install python3-venv          # o python3.13-venv según tu versión
-
-python3 -m venv .venv                  # crea el entorno en .venv/
-.venv/bin/pip install --upgrade pip
-.venv/bin/pip install -r requirements.txt
-```
-
-Para usarlo, activa el entorno (o invoca el binario del venv directamente):
-
-```bash
-source .venv/bin/activate              # luego: python honeypot.py
-# o sin activar:
-.venv/bin/python honeypot.py
-```
-
-### Alternativa: instalación global
-
-Si prefieres instalar a nivel de sistema (no recomendado, puede interferir con
-paquetes gestionados por la distribución):
-
-```bash
-pip install -r requirements.txt --break-system-packages
-```
-
-> **Nota:** los comandos de la sección _Uso_ usan `python3` asumiendo que el
-> entorno virtual está activado. Si no lo activas, sustituye `python3` por
-> `.venv/bin/python`.
-
----
-
-## Uso
-
-### Arrancar (desarrollo)
-
-```bash
-# Requiere Shell API corriendo en localhost:8090
-python3 honeypot.py
-
-# Puerto personalizado y log detallado
-python3 honeypot.py --port 2222 --verbose
-
-# Config alternativa
-python3 honeypot.py --config /etc/ciphersentry/config.yaml
-```
-
-### Arrancar con Docker (producción)
-
-```bash
-# La Shell API debe ser accesible desde el contenedor
-SHELL_API_URL=http://tu-api:8090 SHELL_API_KEY=tu-key docker compose up -d --build
-
-# Ver logs
-docker compose logs -f
-
-# Parar
-docker compose down
-```
-
 ---
 
 ## Configuración
 
 ### config.yaml
 
+El nodo viene **preconfigurado** y funciona desde el minuto cero sin tocar nada. El único campo que puede interesar cambiar es `shell_api_key` si quieres vincular las sesiones a tu cuenta.
+
 ```yaml
+# CipherSentry Honeypot Client — configuración
 host: "0.0.0.0"
 port: 2222
 host_key_file: "host_key"
 ssh_banner: "Debian GNU/Linux 12"
-ssh_version: "OpenSSH_8.4p1 Debian-5+deb11u1"   # sin prefijo SSH-2.0- (asyncssh lo añade)
+ssh_version: "OpenSSH_8.4p1 Debian-5+deb11u1"
 accept_any_password: true
 fake_hostname: "web-srv-01"
 log_dir: "logs"
-shell_api_url: "http://localhost:8090"
-shell_api_key: "tu-api-key"
 verbose: false
 
-# Ventana de captura de credenciales (opcional)
+# Ventana de captura de credenciales: durante [start_minute, end_minute) de cada
+# hora se bloquean los EXEC (comandos sueltos) para registrar credencial + comando
+# sin servirlos. Las sesiones SHELL interactivas se permiten SIEMPRE (son el oro).
 credential_capture:
   enabled: true
   start_minute: 45   # de xx:45
-  end_minute: 60     # a xx:00
+  end_minute: 60     # a xx:00 (60 = en punto)
+
+# Shell API central — preconfigurada, el nodo funciona desde el minuto cero.
+# Sobrescribible con SHELL_API_URL (env o .env).
+shell_api_url: "https://api.ciphersentry.yoire.com"
+
+# URL del panel web (opcional). Si no se indica, node.sh la deriva del api_url.
+# dashboard_url: "https://app.ciphersentry.yoire.com"
+
+# Tu API key de El Enjambre. Cámbiala por la tuya para que las sesiones aparezcan
+# en tu cuenta. Encuéntrala en: El Enjambre → Mi cuenta → API key.
+# Sin cambiarla las sesiones se capturan igualmente pero en modo anónimo.
+shell_api_key: "free-demo"
 ```
 
 ### Ventana de captura de credenciales
@@ -208,7 +121,7 @@ Fuera de la ventana, los EXEC se ejecutan con normalidad.
 | Variable | Descripción | Default |
 |----------|-------------|---------|
 | `HONEYPOT_PORT` | Puerto SSH | `2222` |
-| `SHELL_API_URL` | URL de la Shell API | `http://localhost:8090` |
+| `SHELL_API_URL` | URL de la Shell API | `https://api.ciphersentry.yoire.com` |
 | `SHELL_API_KEY` | API key para la Shell API | `free-demo` |
 | `NODE_ID` | Identidad del nodo (granularidad por nodo en El Enjambre) | `node_identity/id` |
 | `HONEYPOT_VERBOSE` | Log detallado (`1`/`0`) | `0` |
