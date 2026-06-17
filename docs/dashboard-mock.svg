@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="396" viewBox="0 0 680 396" role="img" aria-label="CipherSentry Dashboard — vista ilustrativa">
+  <title>CipherSentry Dashboard — vista ilustrativa · datos no reales</title>
+  <rect width="680" height="396" rx="10" fill="#0d1117"/>
+
+  <!-- ── Header bar ─────────────────────────────────── -->
+  <rect width="680" height="48" rx="10" fill="#161b22"/>
+  <rect y="38" width="680" height="10" fill="#161b22"/>
+  <!-- Logo hexagon -->
+  <path d="M20,8 L34.7,16.5 L34.7,31.5 L20,40 L5.3,31.5 L5.3,16.5 Z" fill="#008a57" fill-opacity="0.12" stroke="#008a57" stroke-width="1.5"/>
+  <circle cx="20" cy="24" r="5" stroke="#008a57" stroke-width="1.5" fill="none"/>
+  <circle cx="20" cy="24" r="2" fill="#008a57"/>
+  <text x="44" y="29" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="13" font-weight="700">CipherSentry</text>
+  <!-- Nav -->
+  <text x="200" y="29" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="12" font-weight="600">Overview</text>
+  <rect x="196" y="42" width="62" height="2" rx="1" fill="#008a57"/>
+  <text x="286" y="29" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="12">El Enjambre</text>
+  <text x="382" y="29" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="12">Sesiones</text>
+  <text x="458" y="29" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="12">Informes</text>
+  <!-- Nodos activos badge -->
+  <circle cx="594" cy="24" r="5" fill="#3fb950"/>
+  <circle cx="594" cy="24" r="3" fill="#0d1117"/>
+  <circle cx="594" cy="24" r="1.5" fill="#3fb950"/>
+  <text x="604" y="28" fill="#3fb950" font-family="-apple-system,sans-serif" font-size="11" font-weight="600">4 nodos</text>
+
+  <!-- ── Stat cards ──────────────────────────────────── -->
+  <!-- Card 1 -->
+  <rect x="16" y="60" width="148" height="68" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="28" y="80" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Sesiones capturadas</text>
+  <text x="28" y="112" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="26" font-weight="700">1.247</text>
+
+  <!-- Card 2 -->
+  <rect x="176" y="60" width="148" height="68" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="188" y="80" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">IPs unicas</text>
+  <text x="188" y="112" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="26" font-weight="700">89</text>
+
+  <!-- Card 3 -->
+  <rect x="336" y="60" width="148" height="68" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="348" y="80" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Comandos / mes</text>
+  <text x="348" y="112" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="26" font-weight="700">14.832</text>
+
+  <!-- Card 4 — Nodos (acento verde) -->
+  <rect x="496" y="60" width="168" height="68" rx="8" fill="#0a1a12" stroke="#008a57" stroke-width="1.5"/>
+  <text x="508" y="80" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Nodos activos</text>
+  <text x="508" y="112" fill="#3fb950" font-family="-apple-system,sans-serif" font-size="26" font-weight="700">4</text>
+  <circle cx="552" cy="100" r="7" fill="#3fb950" opacity="0.2"/>
+  <circle cx="552" cy="100" r="3.5" fill="#3fb950"/>
+
+  <!-- ── Sesiones recientes (izquierda) ─────────────── -->
+  <rect x="16" y="144" width="432" height="228" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="28" y="166" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="12" font-weight="600">Sesiones recientes</text>
+  <!-- Cabecera tabla -->
+  <rect x="16" y="174" width="432" height="24" fill="#21262d" rx="0"/>
+  <rect x="16" y="174" width="432" height="12" fill="#21262d"/>
+  <text x="28"  y="190" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">IP</text>
+  <text x="152" y="190" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Pais</text>
+  <text x="200" y="190" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Credencial</text>
+  <text x="338" y="190" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Cmds</text>
+  <text x="390" y="190" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="10">Hace</text>
+
+  <!-- Fila 1 -->
+  <text x="28"  y="213" fill="#58a6ff" font-family="monospace" font-size="11">203.0.113.42</text>
+  <text x="152" y="213" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">CN</text>
+  <text x="200" y="213" fill="#8b949e" font-family="monospace" font-size="10">root/123456</text>
+  <text x="338" y="213" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">47</text>
+  <text x="390" y="213" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">2 min</text>
+  <line x1="16" y1="220" x2="448" y2="220" stroke="#30363d" stroke-width="0.5"/>
+
+  <!-- Fila 2 -->
+  <rect x="16" y="221" width="432" height="28" fill="#ffffff06"/>
+  <text x="28"  y="239" fill="#58a6ff" font-family="monospace" font-size="11">198.51.100.7</text>
+  <text x="152" y="239" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">RU</text>
+  <text x="200" y="239" fill="#8b949e" font-family="monospace" font-size="10">admin/admin</text>
+  <text x="338" y="239" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">12</text>
+  <text x="390" y="239" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">8 min</text>
+  <line x1="16" y1="248" x2="448" y2="248" stroke="#30363d" stroke-width="0.5"/>
+
+  <!-- Fila 3 -->
+  <text x="28"  y="266" fill="#58a6ff" font-family="monospace" font-size="11">192.0.2.88</text>
+  <text x="152" y="266" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">UA</text>
+  <text x="200" y="266" fill="#8b949e" font-family="monospace" font-size="10">root/password</text>
+  <text x="338" y="266" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">3</text>
+  <text x="390" y="266" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">15 min</text>
+  <line x1="16" y1="274" x2="448" y2="274" stroke="#30363d" stroke-width="0.5"/>
+
+  <!-- Fila 4 -->
+  <rect x="16" y="275" width="432" height="28" fill="#ffffff06"/>
+  <text x="28"  y="293" fill="#58a6ff" font-family="monospace" font-size="11">203.0.113.14</text>
+  <text x="152" y="293" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">NL</text>
+  <text x="200" y="293" fill="#8b949e" font-family="monospace" font-size="10">ubuntu/ubuntu</text>
+  <text x="338" y="293" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">89</text>
+  <text x="390" y="293" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">24 min</text>
+  <line x1="16" y1="302" x2="448" y2="302" stroke="#30363d" stroke-width="0.5"/>
+
+  <!-- Fila 5 -->
+  <text x="28"  y="320" fill="#58a6ff" font-family="monospace" font-size="11">198.51.100.33</text>
+  <text x="152" y="320" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">BR</text>
+  <text x="200" y="320" fill="#8b949e" font-family="monospace" font-size="10">root/toor</text>
+  <text x="338" y="320" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">156</text>
+  <text x="390" y="320" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">31 min</text>
+  <line x1="16" y1="328" x2="448" y2="328" stroke="#30363d" stroke-width="0.5"/>
+
+  <!-- Fila 6 -->
+  <rect x="16" y="329" width="432" height="28" fill="#ffffff06"/>
+  <text x="28"  y="347" fill="#58a6ff" font-family="monospace" font-size="11">192.0.2.201</text>
+  <text x="152" y="347" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">IN</text>
+  <text x="200" y="347" fill="#8b949e" font-family="monospace" font-size="10">pi/raspberry</text>
+  <text x="338" y="347" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="11">22</text>
+  <text x="390" y="347" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="11">47 min</text>
+
+  <!-- ── Top credenciales (derecha) ─────────────────── -->
+  <rect x="462" y="144" width="202" height="228" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="474" y="166" fill="#e6edf3" font-family="-apple-system,sans-serif" font-size="12" font-weight="600">Top credenciales</text>
+
+  <!-- Barras -->
+  <!-- root/123456 34% -->
+  <text x="474" y="192" fill="#8b949e" font-family="monospace" font-size="10">root/123456</text>
+  <rect x="474" y="198" width="150" height="7" rx="3.5" fill="#008a5730"/>
+  <rect x="474" y="198" width="102" height="7" rx="3.5" fill="#008a57"/>
+  <text x="580" y="206" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9">34%</text>
+
+  <!-- admin/admin 22% -->
+  <text x="474" y="225" fill="#8b949e" font-family="monospace" font-size="10">admin/admin</text>
+  <rect x="474" y="231" width="150" height="7" rx="3.5" fill="#008a5730"/>
+  <rect x="474" y="231" width="66" height="7" rx="3.5" fill="#008a57"/>
+  <text x="544" y="239" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9">22%</text>
+
+  <!-- root/password 18% -->
+  <text x="474" y="258" fill="#8b949e" font-family="monospace" font-size="10">root/password</text>
+  <rect x="474" y="264" width="150" height="7" rx="3.5" fill="#008a5730"/>
+  <rect x="474" y="264" width="54" height="7" rx="3.5" fill="#008a57"/>
+  <text x="532" y="272" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9">18%</text>
+
+  <!-- root/root 15% -->
+  <text x="474" y="291" fill="#8b949e" font-family="monospace" font-size="10">root/root</text>
+  <rect x="474" y="297" width="150" height="7" rx="3.5" fill="#008a5730"/>
+  <rect x="474" y="297" width="45" height="7" rx="3.5" fill="#008a57"/>
+  <text x="523" y="305" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9">15%</text>
+
+  <!-- ubuntu/ubuntu 11% -->
+  <text x="474" y="324" fill="#8b949e" font-family="monospace" font-size="10">ubuntu/ubuntu</text>
+  <rect x="474" y="330" width="150" height="7" rx="3.5" fill="#008a5730"/>
+  <rect x="474" y="330" width="33" height="7" rx="3.5" fill="#008a57"/>
+  <text x="511" y="338" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9">11%</text>
+
+  <!-- ── Watermark ───────────────────────────────────── -->
+  <text x="340" y="385" text-anchor="middle" fill="#8b949e" font-family="-apple-system,sans-serif" font-size="9.5" opacity="0.55">Vista previa ilustrativa · IPs de documentacion RFC 5737 · datos no reales</text>
+</svg>

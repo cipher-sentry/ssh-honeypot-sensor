@@ -1,6 +1,6 @@
 # CipherSentry SSH Honeypot
 
-> *Convierte cada ataque en inteligencia.*
+**Convierte cada ataque en inteligencia.**
 
 Honeypot SSH de código abierto que convierte conexiones de atacantes en inteligencia accionable: captura credenciales, sesiones y payloads, y los hace creíbles delegando la emulación en la **CipherSentry Shell API**.
 
@@ -8,60 +8,53 @@ Honeypot SSH de código abierto que convierte conexiones de atacantes en intelig
 
 ---
 
-## Arquitectura
+## El Enjambre — red de sensores distribuidos
 
-```
-Atacante
-  │  SSH (puerto 2222)
-  ▼
-ssh-honeypot-sensor      ← este proyecto (código abierto)
-  · acepta conexión SSH
-  · captura: IP, usuario, contraseña, cliente SSH
-  · reenvía cada comando a la Shell API
-  · devuelve la respuesta al atacante
-  · registra todo en logs/sessions.jsonl
-        │
-        │  HTTP  (X-API-Key)
-        ▼
-CipherSentry Shell API   ← privado, no incluido
-  · engine de emulación completo
-  · VFS Debian 12 aislado por sesión
-  · 70+ comandos simulados
-```
+![El Enjambre — red de sensores distribuidos](docs/enjambre.png)
+
+Instala el sensor en cualquier servidor o VPS con un comando. Puedes desplegar tantos nodos como quieras — todos quedan visibles y gestionables desde el mismo dashboard. La inteligencia se agrega automáticamente: cuantos más nodos, más señal.
 
 ---
 
-## Despliegue de un nodo nuevo
+## Despliegue rápido
 
-Instalación en una línea — instala Docker si falta, descarga el sensor y lo arranca:
+![Instalación CipherSentry](docs/terminal-install.png)
 
 ```bash
 curl -fsSL https://ciphersentry.yoire.com/install.sh | bash
 ```
 
-Para vincular el nodo a tu cuenta desde el inicio, pásale tu key:
+### Opciones del instalador
+
+| Opción | Descripción | Default |
+|--------|-------------|---------|
+| `--key <api_key>` | Vincula el nodo a tu cuenta desde el primer momento | *modo anónimo* |
+| `--dir <ruta>` | Directorio de instalación | `/opt/ciphersentry` |
+| `--port <num>` | Puerto SSH del honeypot | 22 si libre, si no 2222 |
+| `--no-docker` | Omite la instalación de Docker (ya lo tienes) | — |
+
+Ejemplos habituales:
 
 ```bash
+# Con cuenta vinculada
 curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --key <tu-key>
+
+# Docker ya instalado, directorio personalizado
+curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- \
+  --dir /opt/ciphersentry \
+  --no-docker
+
+# Puerto específico (p. ej. en un servidor con SSH real en el 22)
+curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --port 2222
 ```
 
-Tras instalar, gestiona el nodo con `node.sh` (desde el directorio de instalación):
+**Funciona desde el minuto cero:** el sensor viene preconfigurado con la Shell API de CipherSentry.
+
+**Vincular el nodo a tu cuenta:**
 
 ```bash
-bash node.sh up      # arranca (elige puerto: 22 si libre, si no 2222)
-bash node.sh         # estado, actividad y orientación
-```
-
-**Funciona desde el minuto cero:** el cliente viene con la Shell API central de
-CipherSentry preconfigurada, así que un nodo recién instalado ya emula comandos.
-
-**Vincular el nodo a tu cuenta (atribución):** la identidad del nodo es su `node_id`
-(se genera local; su clave privada nunca viaja). Para que tus capturas cuenten en tu
-cuenta y tu plan:
-
-```bash
-bash node.sh enroll          # imprime tu código (p. ej. NODO-A1B2-C3D4-E5F6)
-# → entra/crea cuenta en el dashboard → El Enjambre → Añadir nodo → pega el código
+bash node.sh enroll     # imprime tu código (p. ej. NODO-A1B2-C3D4-E5F6)
+# → El Enjambre → Añadir nodo → pega el código
 ```
 
 A partir de ahí, todas tus capturas aparecen en tu cuenta.
@@ -80,6 +73,34 @@ Desde el directorio de instalación (`/opt/ciphersentry` por defecto):
 | `bash node.sh logs` | Actividad en tiempo real |
 | `bash node.sh enroll` | Código para vincular este nodo a tu cuenta |
 | `bash node.sh test` | Probar la conexión a la Shell API |
+
+---
+
+## Dashboard
+
+![CipherSentry Dashboard — vista ilustrativa](docs/dashboard-mock.svg)
+
+Gestiona todos tus nodos, explora sesiones, analiza IPs y exporta inteligencia desde un único panel.
+
+---
+
+## Planes
+
+|  | **Free** | **Starter** | **Pro** | **Enterprise** |
+|--|----------|-------------|---------|----------------|
+| **Precio** | Gratis | €19/mes | €79/mes | €499/mes |
+| Sesiones de honeypot | ✓ | ✓ | ✓ | ✓ |
+| Comandos emulados/mes | ✓ | ✓ | ✓ | ✓ |
+| Nodos en el enjambre | ✓ | ✓ | ✓ | ✓ |
+| Export de datos (RGPD) | ✓ | ✓ | ✓ | ✓ |
+| Onboarding guiado | — | *próximamente* | *próximamente* | *próximamente* |
+| Inteligencia: IOCs e informes | — | — | *próximamente* | *próximamente* |
+| Detección de campañas | — | — | *próximamente* | *próximamente* |
+| Retención extendida | — | — | *próximamente* | *próximamente* |
+| Seguridad avanzada / on-prem | — | — | — | *próximamente* |
+| Soberanía del dato | — | — | — | *próximamente* |
+
+Sin tarjeta de crédito para empezar · [Ver todos los planes →](https://ciphersentry.yoire.com/planes.html)
 
 ---
 
@@ -154,9 +175,6 @@ automáticamente de `node_identity/id` (generado por `node.sh`). Con Docker, mon
 ## Shell API
 
 Este honeypot requiere una instancia de **CipherSentry Shell API** para funcionar. Sin ella, no puede emular comandos.
-
-- Tier **Free** (10.000 comandos/mes): gratuito
-- Tiers de pago para despliegues con tráfico real
 
 Más información: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
 

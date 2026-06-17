@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="380" role="img" aria-label="CipherSentry install demo">
+  <title>CipherSentry — instalación en una línea</title>
+
+  <!-- Ventana terminal -->
+  <rect width="680" height="380" rx="10" fill="#0d1117"/>
+
+  <!-- Chrome barra superior -->
+  <rect width="680" height="36" rx="10" fill="#161b22"/>
+  <rect y="26" width="680" height="10" fill="#161b22"/>
+  <circle cx="20" cy="18" r="6" fill="#ff5f56"/>
+  <circle cx="40" cy="18" r="6" fill="#ffbd2e"/>
+  <circle cx="60" cy="18" r="6" fill="#27c93f"/>
+  <text x="340" y="23" font-family="monospace" font-size="12" fill="#8b949e" text-anchor="middle">bash</text>
+
+  <!-- Prompt inicial -->
+  <text x="20" y="66" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#8b949e">$ </text>
+  <text x="36" y="66" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3">curl -fsSL https://ciphersentry.yoire.com/install.sh | bash</text>
+
+  <!-- Banner -->
+  <text x="20" y="92" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">╔══════════════════════════════════════════════════╗</text>
+  <text x="20" y="109" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">║   CipherSentry · SSH Honeypot — Instalando...    ║</text>
+  <text x="20" y="126" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">╚══════════════════════════════════════════════════╝</text>
+
+  <!-- Paso Docker -->
+  <text x="20" y="150" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">▶ </text>
+  <text x="34" y="150" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3" font-weight="bold">Docker</text>
+  <text x="20" y="167" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">  ✓ </text>
+  <text x="46" y="167" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3">Docker ya instalado (27.3.1).</text>
+
+  <!-- Paso Sensor -->
+  <text x="20" y="188" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">▶ </text>
+  <text x="34" y="188" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3" font-weight="bold">Descargando sensor</text>
+  <text x="20" y="205" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#8b949e">  ▸ Descargando bundle desde GitHub…</text>
+  <text x="20" y="222" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">  ✓ </text>
+  <text x="46" y="222" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3">Sensor descargado en /opt/ciphersentry.</text>
+
+  <!-- Paso Identidad -->
+  <text x="20" y="243" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">▶ </text>
+  <text x="34" y="243" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3" font-weight="bold">Identidad del nodo</text>
+  <text x="20" y="260" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">  ✓ </text>
+  <text x="46" y="260" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3">Identidad generada (node_id: a1b2c3d4…).</text>
+
+  <!-- Paso Arranque -->
+  <text x="20" y="281" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#23d1e7">▶ </text>
+  <text x="34" y="281" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3" font-weight="bold">Arrancando honeypot</text>
+  <text x="20" y="298" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">  ✓ </text>
+  <text x="46" y="298" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#e6edf3">Contenedor arrancado.</text>
+
+  <!-- Box éxito final -->
+  <text x="20" y="323" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">╔══════════════════════════════════════════════════╗</text>
+  <text x="20" y="340" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">║  </text>
+  <text x="44" y="340" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950" font-weight="bold">✓ CipherSentry Honeypot instalado</text>
+  <text x="20" y="357" font-family="'JetBrains Mono','Fira Code','Courier New',monospace" font-size="12.5" fill="#3fb950">╚══════════════════════════════════════════════════╝</text>
+</svg>
