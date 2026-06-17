@@ -1,0 +1,20 @@
+services:
+  honeypot:
+    build: .
+    restart: unless-stopped
+    mem_limit: 128m          # A2: cap del honeypot (no puede ahogar ni ser ahogado)
+    # Puerto externo (host) → interno (contenedor, siempre 2222). Por defecto 22,
+    # que es donde un honeypot SSH debe escuchar. Sobrescribible con HONEYPOT_PORT.
+    ports:
+      - "${HONEYPOT_PORT:-22}:2222"
+    volumes:
+      - ./logs:/app/logs
+      - ./host_key:/app/host_key
+      - ./config.yaml:/app/config.yaml:ro
+      # Identidad del nodo (node_id + clave ed25519) generada por `node.sh`.
+      - ./node_identity:/app/node_identity:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Toda la configuración va en config.yaml (montado como volumen).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

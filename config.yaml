@@ -1,0 +1,30 @@
+# CipherSentry Honeypot Client — configuración
+host: "0.0.0.0"
+port: 2222
+host_key_file: "host_key"
+ssh_banner: "Debian GNU/Linux 12"
+ssh_version: "OpenSSH_8.4p1 Debian-5+deb11u1"
+accept_any_password: true
+fake_hostname: "web-srv-01"
+log_dir: "logs"
+verbose: false
+
+# Ventana de captura de credenciales: durante [start_minute, end_minute) de cada
+# hora se bloquean los EXEC (comandos sueltos) para registrar credencial + comando
+# sin servirlos. Las sesiones SHELL interactivas se permiten SIEMPRE (son el oro).
+credential_capture:
+  enabled: true
+  start_minute: 45   # de xx:45
+  end_minute: 60     # a xx:00 (60 = en punto)
+
+# Shell API central — preconfigurada, el nodo funciona desde el minuto cero.
+# Sobrescribible con SHELL_API_URL (env o .env).
+shell_api_url: "https://api.ciphersentry.yoire.com"
+
+# URL del panel web (opcional). Si no se indica, node.sh la deriva del api_url.
+# dashboard_url: "https://app.ciphersentry.yoire.com"
+
+# Tu API key de El Enjambre. Cámbiala por la tuya para que las sesiones aparezcan
+# en tu cuenta. Encuéntrala en: El Enjambre → Mi cuenta → API key.
+# Sin cambiarla las sesiones se capturan igualmente pero en modo anónimo.
+shell_api_key: "free-demo"

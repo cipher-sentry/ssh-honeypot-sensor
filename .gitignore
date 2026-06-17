@@ -1,0 +1,11 @@
+host_key
+host_key.pub
+.env
+node_identity/
+logs/
+*.jsonl
+*.log
+.venv/
+venv/
+__pycache__/
+*.pyc
