@@ -93,8 +93,14 @@ _dashboard_url() {
   [ -z "$d" ] && d=$(grep -E '^[[:space:]]*dashboard_url:' config.yaml 2>/dev/null \
     | sed -E 's/^[^:]*:[[:space:]]*"?([^"#[:space:]]+).*/\1/' | head -1)
   [ -n "$d" ] && { echo "$d"; return; }
+  # Fallback si no hay dashboard_url: del shell_api_url. Modelo por dominios
+  # (api.dominio → app.dominio) o legacy IP:puerto (→ :8080).
   local u; u="$(_api_url)"; [ -z "$u" ] && return
-  echo "$u" | sed -E 's#(://[^:/]+):[0-9]+.*#\1:8080#'
+  if echo "$u" | grep -qE '://api\.'; then
+    echo "$u" | sed -E 's#://api\.#://app.#'
+  else
+    echo "$u" | sed -E 's#(://[^:/]+):[0-9]+.*#\1:8080#'
+  fi
 }
 # ¿Está configurada la SHELL_API_KEY? Prioridad: env → config.yaml → ok | unset
 _key_check() {
@@ -192,7 +198,9 @@ cmd_up() {
   if [ -n "${HONEYPOT_PORT:-}" ]; then
     printf "  ${C_CY}▸${C_NC} Puerto fijado por HONEYPOT_PORT: ${C_BD}%s${C_NC}\n" "$port"
   elif [ "$port" = "2222" ]; then
-    printf "  ${C_YE}!${C_NC} El puerto 22 está ocupado → el honeypot usará ${C_BD}2222${C_NC}.\n"
+    printf "\n  \033[1;30;43m  ⚠  PUERTO 22 OCUPADO — EL HONEYPOT USARÁ EL 2222  \033[0m\n\n"
+    printf "  ${C_YE}${C_BD}Importante:${C_NC} los atacantes escanean sobre todo el ${C_BD}22${C_NC}; en 2222 capturarás ${C_BD}menos${C_NC}.\n"
+    printf "  ${C_DIM}Para usar el 22: libera el puerto (mueve tu SSH de admin a otro) y reinicia, o ${C_BD}HONEYPOT_PORT=22 bash node.sh up${C_NC}${C_DIM}.${C_NC}\n"
   else
     printf "  ${C_GR}✓${C_NC} Puerto 22 libre → el honeypot escuchará en ${C_BD}22${C_NC}.\n"
   fi
