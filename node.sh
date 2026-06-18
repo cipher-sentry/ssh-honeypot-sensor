@@ -241,11 +241,13 @@ cmd_update() {
   fi
   # Los ficheros vienen bajo el prefijo 'sensor/'. Sustituimos solo el CÓDIGO;
   # NO se tocan config.yaml (tu key/URL), node_identity/ ni logs/.
+  # Usamos `mv` (no `cp`): reemplaza el inode, así el bash que está EJECUTANDO este
+  # mismo node.sh sigue leyendo el inode viejo intacto y no se corrompe a media ejecución.
   local src="$tmp/sensor"; [ -d "$src" ] || src="$tmp"
   local f
   for f in VERSION api_client.py config.py honeypot.py logger.py ssh_server.py \
            sftp_server.py node.sh entrypoint.sh Dockerfile docker-compose.yml requirements.txt; do
-    [ -f "$src/$f" ] && cp "$src/$f" "$SCRIPT_DIR/$f"
+    [ -f "$src/$f" ] && mv -f "$src/$f" "$SCRIPT_DIR/$f"
   done
   chmod +x "$SCRIPT_DIR/node.sh" "$SCRIPT_DIR/entrypoint.sh" 2>/dev/null
   rm -rf "$tmp"
