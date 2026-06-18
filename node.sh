@@ -110,6 +110,17 @@ _key_check() {
   [ -n "$k" ] && [ "$k" != "free-demo" ] && echo ok || echo unset
 }
 
+# ¿Está este nodo ENROLADO? (vinculación real por node_id, no por API key). Pregunta
+# al panel. Devuelve: yes | no | unknown (sin red/panel). Acota a 5s.
+_enroll_check() {
+  local du code r; du="$(_dashboard_url)"; code="$(_enroll_code)"
+  [ -z "$du" ] || [ -z "$code" ] && { echo unknown; return; }
+  r=$(curl -s -m 5 "$du/api/public/node-enrolled?code=$code" 2>/dev/null)
+  if echo "$r" | grep -q '"enrolled"[[:space:]]*:[[:space:]]*true'; then echo yes
+  elif echo "$r" | grep -q '"enrolled"'; then echo no
+  else echo unknown; fi
+}
+
 # Puerto a usar al ARRANCAR: HONEYPOT_PORT si se fija; si nuestro honeypot ya está
 # en 22 se mantiene; si no, 22 si está libre, o 2222 si lo ocupa otro servicio.
 _pick_port() {
@@ -161,9 +172,12 @@ cmd_status() {
     printf "  ${C_YE}!${C_NC} shell_api_url apunta a una IP directa — puede dejar de funcionar si cambia la infra.\n"
     printf "     ${C_DIM}Usa el dominio estable en config.yaml:  shell_api_url: \"https://api.ciphersentry.yoire.com\"${C_NC}\n"
   fi
-  # Atribución El Enjambre
-  local key_st; key_st="$(_key_check)"
-  if [ "$key_st" = "unset" ]; then
+  # Atribución El Enjambre — vinculación REAL por node_id (preguntada al panel),
+  # no por la API key (que es solo transporte compartido).
+  local enr; enr="$(_enroll_check)"
+  if [ "$enr" = "yes" ]; then
+    printf "  Enjambre:  ${C_GR}● vinculado${C_NC}  ${C_DIM}(nodo enrolado a tu cuenta)${C_NC}\n"
+  elif [ "$enr" = "no" ]; then
     local _ec; _ec="$(_enroll_code)"
     local _he; _he=$(hostname 2>/dev/null | tr 'a-z' 'A-Z' | tr -cd 'A-Z0-9' | cut -c1-16)
     local _du; _du="$(_dashboard_url)"
@@ -173,9 +187,9 @@ cmd_status() {
       printf "             ${C_CY}%s/enroll.html?code=%s&name=%s${C_NC}\n" \
         "$_du" "$_ec" "${_he:-node}"
     fi
-    printf "             ${C_DIM}Luego pon tu API key en config.yaml y reinicia.${C_NC}\n"
+    printf "             ${C_DIM}(no necesitas API key: la vinculación es por node_id)${C_NC}\n"
   else
-    printf "  Enjambre:  ${C_GR}● activo${C_NC}  ${C_DIM}(sesiones ligadas a tu cuenta)${C_NC}\n"
+    printf "  Enjambre:  ${C_DIM}? vinculación no comprobable (sin acceso al panel)${C_NC}\n"
   fi
 
   printf "\n${C_BD}¿Qué hacer ahora?${C_NC}\n"
@@ -229,6 +243,8 @@ cmd_update() {
   rm -rf "$tmp"
   printf "  ${C_GR}✓${C_NC} Actualizado a ${C_BD}v%s${C_NC} «%s». Reconstruyendo el contenedor…\n" "$(_version)" "$(_codename)"
   cmd_up
+  printf "\n  ${C_YE}▸${C_NC} ${C_DIM}El estado de arriba lo dibuja la versión ANTERIOR (aún en memoria).${C_NC}\n"
+  printf "    ${C_DIM}Vuelve a ejecutar ${C_BD}bash node.sh${C_NC}${C_DIM} para verlo con la versión nueva.${C_NC}\n"
 }
 
 cmd_enroll() {
