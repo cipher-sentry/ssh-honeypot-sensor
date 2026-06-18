@@ -392,12 +392,15 @@ def _random_last_ip() -> str:
 async def _register_cred_probe(api: ShellAPIClient, username: str,
                                 src_ip: str, src_port: int, session_id: str,
                                 password: str = "", auth_method: str = "password",
-                                client_version: str = ""):
+                                client_version: str = "", cap_mode: bool = False):
     """Registra una sesión CRED_PROBE en el engine (create + close inmediato)
-    para que IP y credencial aparezcan en el dashboard / El Enjambre."""
+    para que IP y credencial aparezcan en el dashboard / El Enjambre.
+    `cap_mode` = estado REAL de la ventana de captura del nodo (no True fijo): así el
+    dashboard solo marca «solo credenciales» cuando el nodo está de verdad en su franja,
+    no por un cred-probe incidental."""
     try:
         sess = await api.create_session(username, src_ip, src_port,
-                                        session_id=session_id, capture_mode=True,
+                                        session_id=session_id, capture_mode=cap_mode,
                                         password=password, auth_method=auth_method,
                                         client_version=client_version)
         await api.close_session(sess["session_id"])
@@ -458,6 +461,7 @@ class HoneypotSSHServer(asyncssh.SSHServer):
                     self._api, self._username, self._src_ip, self._src_port,
                     cred_sid, password=saved_password,
                     auth_method=saved_auth_method, client_version=saved_client_ver,
+                    cap_mode=_en_ventana_captura(self._config),
                 ))
             except Exception:
                 pass
