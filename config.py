@@ -8,6 +8,19 @@ import os
 import yaml
 
 
+def _read_version():
+    """Versión + codename de la sonda (fuente única: fichero VERSION del bundle).
+    Permite saber, en node.sh y en el dashboard, qué versión corre cada nodo."""
+    try:
+        lines = (Path(__file__).resolve().parent / "VERSION").read_text().splitlines()
+        return (lines[0].strip() or "0.0.0", lines[1].strip() if len(lines) > 1 else "")
+    except Exception:
+        return ("0.0.0", "")
+
+
+SENSOR_VERSION, SENSOR_CODENAME = _read_version()
+
+
 @dataclass
 class Config:
     host: str = "0.0.0.0"

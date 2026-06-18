@@ -10,7 +10,7 @@ import signal
 import sys
 
 from api_client import ShellAPIClient
-from config import load_config
+from config import load_config, SENSOR_VERSION, SENSOR_CODENAME
 from logger import AuditLogger
 from ssh_server import create_server
 
@@ -31,8 +31,9 @@ async def main():
     logger = AuditLogger(config.log_dir, verbose=config.verbose,
                          node_id=config.node_id)
     api = ShellAPIClient(config.shell_api_url, config.shell_api_key,
-                         node_id=config.node_id)
+                         node_id=config.node_id, sensor_version=SENSOR_VERSION)
 
+    logger.logger.info(f"Sonda CipherSentry v{SENSOR_VERSION} «{SENSOR_CODENAME}»")
     logger.logger.info(f"Shell API: {config.shell_api_url}")
     if config.node_id:
         logger.logger.info(f"Node ID: {config.node_id}")

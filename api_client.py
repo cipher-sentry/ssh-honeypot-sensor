@@ -19,9 +19,10 @@ class ShellAPIClient:
     """
 
     def __init__(self, base_url: str, api_key: str, timeout: float = 15.0,
-                 node_id: str = None):
+                 node_id: str = None, sensor_version: str = ""):
         self._base = base_url.rstrip("/")
         self._node_id = node_id or None
+        self._sensor_version = sensor_version or ""
         self._headers = {
             "X-API-Key": api_key,
             "Content-Type": "application/json",
@@ -51,8 +52,15 @@ class ShellAPIClient:
             raise ShellAPIError(r.status_code, detail)
 
     async def create_session(self, username: str, src_ip: str, src_port: int,
-                             session_id: str = None, capture_mode: bool = None) -> dict:
-        body = {"username": username, "src_ip": src_ip, "src_port": src_port}
+                             session_id: str = None, capture_mode: bool = None,
+                             password: str = "", auth_method: str = "password",
+                             client_version: str = "") -> dict:
+        body = {"username": username, "src_ip": src_ip, "src_port": src_port,
+                # Credencial intentada en el login SSH: viaja al engine para que la sesión
+                # quede atribuida con su password/método también en nodos remotos (no solo
+                # en el log local de la sonda).
+                "password": password, "auth_method": auth_method,
+                "client_version": client_version}
         if session_id:
             body["session_id"] = session_id
         if capture_mode is not None:
@@ -60,6 +68,9 @@ class ShellAPIClient:
             body["capture_mode"] = bool(capture_mode)
         if self._node_id:
             body["node_id"] = self._node_id
+        if self._sensor_version:
+            # Versión de la sonda → el engine la guarda por nodo (visibilidad en el dashboard).
+            body["sensor_version"] = self._sensor_version
         r = await self._client.post(
             f"{self._base}/v1/session",
             headers=self._headers,

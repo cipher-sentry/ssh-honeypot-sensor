@@ -12,6 +12,7 @@
 #   down     Para el honeypot.
 #   logs     Sigue los logs del contenedor en vivo.
 #   test     Comprueba la conexión SSH al honeypot en su puerto real.
+#   update   Descarga la última versión publicada (release) y reconstruye.
 #   help     Esta ayuda.
 # ──────────────────────────────────────────────────────
 set -uo pipefail
@@ -52,6 +53,17 @@ _fix_identity_perms() {
 }
 _node_id()     { [ -f "$IDDIR/id" ] && cat "$IDDIR/id"; }
 _enroll_code() { [ -f "$IDDIR/enroll_code" ] && cat "$IDDIR/enroll_code"; }
+
+# ── Versión de la sonda (fuente única: fichero VERSION del bundle) ───────────
+REPO_SLUG="cipher-sentry/ssh-honeypot-sensor"
+_version()  { [ -f "$SCRIPT_DIR/VERSION" ] && sed -n '1p' "$SCRIPT_DIR/VERSION" | tr -d ' \r' || echo "0.0.0"; }
+_codename() { [ -f "$SCRIPT_DIR/VERSION" ] && sed -n '2p' "$SCRIPT_DIR/VERSION" | tr -d '\r' | sed 's/^ *//;s/ *$//'; }
+# Último tag publicado en GitHub (vacío si no hay red). Acota a 5s para no colgar status.
+_latest_release() {
+  curl -s -m 5 "https://api.github.com/repos/$REPO_SLUG/releases/latest" 2>/dev/null \
+    | grep -oE '"tag_name"[[:space:]]*:[[:space:]]*"[^"]+"' | head -1 \
+    | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
+}
 
 _running()     { $DC ps --format '{{.State}}' 2>/dev/null | grep -q running; }
 _mapped_port() { $DC ps --format '{{.Ports}}' 2>/dev/null | grep -oE '(0\.0\.0\.0|\*):[0-9]+->2222' | grep -oE ':[0-9]+' | tr -d ':' | head -1; }
@@ -109,6 +121,17 @@ cmd_status() {
   printf "${C_CY}╔══════════════════════════════════════════════════╗${C_NC}\n"
   printf "${C_CY}║   CipherSentry · Nodo Honeypot                    ║${C_NC}\n"
   printf "${C_CY}╚══════════════════════════════════════════════════╝${C_NC}\n\n"
+
+  # Versión + codename + chequeo de actualización (sirve para saber si el nodo
+  # corre la versión esperada).
+  local ver cod latest; ver="$(_version)"; cod="$(_codename)"; latest="$(_latest_release)"
+  if [ -n "$latest" ] && [ "$latest" != "$ver" ]; then
+    printf "  Versión:  ${C_BD}v%s${C_NC} «%s»   ${C_YE}⚠ hay v%s${C_NC} ${C_DIM}→ bash node.sh update${C_NC}\n" "$ver" "$cod" "$latest"
+  elif [ -n "$latest" ]; then
+    printf "  Versión:  ${C_BD}v%s${C_NC} «%s»   ${C_GR}✓ al día${C_NC}\n" "$ver" "$cod"
+  else
+    printf "  Versión:  ${C_BD}v%s${C_NC} «%s»\n" "$ver" "$cod"
+  fi
 
   if _running; then
     printf "  Estado:   ${C_GR}● corriendo${C_NC}  ·  puerto ${C_BD}%s${C_NC}\n" "$eport"
@@ -176,6 +199,30 @@ cmd_up() {
   HONEYPOT_PORT="$port" $DC up -d --build && echo && cmd_status
 }
 
+cmd_update() {
+  local url="https://github.com/$REPO_SLUG/releases/latest/download/sensor.tar.gz"
+  printf "  ${C_CY}▸${C_NC} Versión actual: ${C_BD}v%s${C_NC} «%s». Descargando la última…\n" "$(_version)" "$(_codename)"
+  local tmp; tmp="$(mktemp -d)" || return 1
+  if ! curl -fsSL -m 60 "$url" -o "$tmp/sensor.tar.gz"; then
+    printf "  ${C_RE}✗${C_NC} No se pudo descargar %s\n" "$url"; rm -rf "$tmp"; return 1
+  fi
+  if ! tar -xzf "$tmp/sensor.tar.gz" -C "$tmp" 2>/dev/null; then
+    printf "  ${C_RE}✗${C_NC} El paquete descargado está corrupto.\n"; rm -rf "$tmp"; return 1
+  fi
+  # Los ficheros vienen bajo el prefijo 'sensor/'. Sustituimos solo el CÓDIGO;
+  # NO se tocan config.yaml (tu key/URL), node_identity/ ni logs/.
+  local src="$tmp/sensor"; [ -d "$src" ] || src="$tmp"
+  local f
+  for f in VERSION api_client.py config.py honeypot.py logger.py ssh_server.py \
+           sftp_server.py node.sh entrypoint.sh Dockerfile docker-compose.yml requirements.txt; do
+    [ -f "$src/$f" ] && cp "$src/$f" "$SCRIPT_DIR/$f"
+  done
+  chmod +x "$SCRIPT_DIR/node.sh" "$SCRIPT_DIR/entrypoint.sh" 2>/dev/null
+  rm -rf "$tmp"
+  printf "  ${C_GR}✓${C_NC} Actualizado a ${C_BD}v%s${C_NC} «%s». Reconstruyendo el contenedor…\n" "$(_version)" "$(_codename)"
+  cmd_up
+}
+
 cmd_enroll() {
   _ensure_identity
   local durl; durl="$(_dashboard_url)"
@@ -200,6 +247,7 @@ cmd_enroll() {
 case "${1:-status}" in
   status) cmd_status ;;
   up)     cmd_up ;;
+  update) cmd_update ;;
   enroll) cmd_enroll ;;
   down)   $DC down ;;
   logs)   $DC logs -f ;;

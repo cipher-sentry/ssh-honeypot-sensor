@@ -230,7 +230,9 @@ async def run_shell(process: asyncssh.SSHServerProcess,
     # Crear sesión en la API usando el mismo session_id del SSH
     try:
         sess_data = await api.create_session(username, src_ip, src_port, session_id,
-                                             capture_mode=_cap_mode)
+                                             capture_mode=_cap_mode, password=password,
+                                             auth_method=auth_method,
+                                             client_version=client_version)
     except Exception as e:
         logger.logger.error(f"[{session_id}] API create_session error: {e}")
         process.exit(1)
@@ -388,12 +390,16 @@ def _random_last_ip() -> str:
 
 
 async def _register_cred_probe(api: ShellAPIClient, username: str,
-                                src_ip: str, src_port: int, session_id: str):
+                                src_ip: str, src_port: int, session_id: str,
+                                password: str = "", auth_method: str = "password",
+                                client_version: str = ""):
     """Registra una sesión CRED_PROBE en el engine (create + close inmediato)
     para que IP y credencial aparezcan en el dashboard / El Enjambre."""
     try:
         sess = await api.create_session(username, src_ip, src_port,
-                                        session_id=session_id, capture_mode=True)
+                                        session_id=session_id, capture_mode=True,
+                                        password=password, auth_method=auth_method,
+                                        client_version=client_version)
         await api.close_session(sess["session_id"])
     except Exception:
         pass
@@ -450,7 +456,8 @@ class HoneypotSSHServer(asyncssh.SSHServer):
                 loop = asyncio.get_event_loop()
                 loop.create_task(_register_cred_probe(
                     self._api, self._username, self._src_ip, self._src_port,
-                    cred_sid,
+                    cred_sid, password=saved_password,
+                    auth_method=saved_auth_method, client_version=saved_client_ver,
                 ))
             except Exception:
                 pass
