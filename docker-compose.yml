@@ -11,10 +11,15 @@ services:
       - ./logs:/app/logs
       - ./host_key:/app/host_key
       - ./config.yaml:/app/config.yaml:ro
-      # Identidad del nodo (node_id + clave ed25519) generada por `node.sh`.
-      - ./node_identity:/app/node_identity:ro
+      # Identidad del nodo (node_id + clave ed25519 + node_key). rw para que el
+      # entrypoint (root) auto-genere la node_key si falta y la persista.
+      - ./node_identity:/app/node_identity
     environment:
       - PYTHONUNBUFFERED=1
-      # Toda la configuración va en config.yaml (montado como volumen).
+      - SHELL_API_URL=${SHELL_API_URL:-https://api.ciphersentry.yoire.com}
+      - SHELL_API_KEY=${SHELL_API_KEY:-free-demo}
+      # Identidad del nodo: si está vacío, config.py lo lee de node_identity/id.
+      - NODE_ID=${NODE_ID:-}
+      - HONEYPOT_VERBOSE=${HONEYPOT_VERBOSE:-0}
     extra_hosts:
       - "host.docker.internal:host-gateway"

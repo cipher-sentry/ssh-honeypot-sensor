@@ -13,8 +13,15 @@ NODE_ID="${NODE_ID:-}"
 if [ -z "$NODE_ID" ] && [ -f /app/node_identity/id ]; then
   NODE_ID=$(cat /app/node_identity/id 2>/dev/null | tr -d '[:space:]')
 fi
-# Igual con la llave del nodo (node_key): la lee root aquí y la pasa por env, porque
-# 'honeypot' no puede leer node_identity/. Autentica al nodo (cabecera X-Node-Key).
+# Llave del nodo (node_key): autentica al nodo (cabecera X-Node-Key). AUTO-PROVISIÓN:
+# si falta, la genera root aquí (node_identity va rw) y la persiste; así cualquier nodo
+# queda protegido en su primer arranque sin que el usuario toque nada. La pasamos por env
+# porque el usuario 'honeypot' no puede leer node_identity/.
+if [ ! -f /app/node_identity/node_key ]; then
+  mkdir -p /app/node_identity 2>/dev/null || true
+  python3 -c "import secrets;print(secrets.token_urlsafe(24))" > /app/node_identity/node_key 2>/dev/null
+  chmod 600 /app/node_identity/node_key 2>/dev/null || true
+fi
 NODE_KEY="${NODE_KEY:-}"
 if [ -z "$NODE_KEY" ] && [ -f /app/node_identity/node_key ]; then
   NODE_KEY=$(cat /app/node_identity/node_key 2>/dev/null | tr -d '[:space:]')
