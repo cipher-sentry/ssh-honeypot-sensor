@@ -34,6 +34,7 @@ class Config:
     shell_api_url: str = "http://localhost:8090"
     shell_api_key: str = "free-demo"
     node_id: str = ""
+    node_key: str = ""   # llave secreta del nodo (auto-generada por node.sh) → cabecera X-Node-Key
     log_dir: str = "logs"
     verbose: bool = False
     # Ventana de captura de credenciales: bloquea EXEC en [start_minute, end_minute)
@@ -84,5 +85,17 @@ def load_config(path: str = "config.yaml") -> Config:
             cfg.node_id = id_file.read_text(encoding="utf-8").strip()
         except Exception:
             cfg.node_id = ""
+
+    # Llave secreta del nodo (auto-generada por node.sh, nunca editada a mano).
+    # Primero env NODE_KEY (la pasa el entrypoint, que SÍ puede leer node_identity/ como
+    # root); si no, el fichero directamente (p. ej. al ejecutar fuera del contenedor).
+    if not cfg.node_key and os.environ.get("NODE_KEY"):
+        cfg.node_key = os.environ["NODE_KEY"]
+    if not cfg.node_key:
+        kf = Path(__file__).parent / "node_identity" / "node_key"
+        try:
+            cfg.node_key = kf.read_text(encoding="utf-8").strip()
+        except Exception:
+            cfg.node_key = ""
 
     return cfg

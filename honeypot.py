@@ -31,7 +31,8 @@ async def main():
     logger = AuditLogger(config.log_dir, verbose=config.verbose,
                          node_id=config.node_id)
     api = ShellAPIClient(config.shell_api_url, config.shell_api_key,
-                         node_id=config.node_id, sensor_version=SENSOR_VERSION)
+                         node_id=config.node_id, sensor_version=SENSOR_VERSION,
+                         node_key=config.node_key)
 
     logger.logger.info(f"Sonda CipherSentry v{SENSOR_VERSION} «{SENSOR_CODENAME}»")
     logger.logger.info(f"Shell API: {config.shell_api_url}")

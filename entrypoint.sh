@@ -13,4 +13,10 @@ NODE_ID="${NODE_ID:-}"
 if [ -z "$NODE_ID" ] && [ -f /app/node_identity/id ]; then
   NODE_ID=$(cat /app/node_identity/id 2>/dev/null | tr -d '[:space:]')
 fi
-exec su honeypot -s /bin/sh -c "NODE_ID='$NODE_ID' exec python3 honeypot.py"
+# Igual con la llave del nodo (node_key): la lee root aquí y la pasa por env, porque
+# 'honeypot' no puede leer node_identity/. Autentica al nodo (cabecera X-Node-Key).
+NODE_KEY="${NODE_KEY:-}"
+if [ -z "$NODE_KEY" ] && [ -f /app/node_identity/node_key ]; then
+  NODE_KEY=$(cat /app/node_identity/node_key 2>/dev/null | tr -d '[:space:]')
+fi
+exec su honeypot -s /bin/sh -c "NODE_ID='$NODE_ID' NODE_KEY='$NODE_KEY' exec python3 honeypot.py"

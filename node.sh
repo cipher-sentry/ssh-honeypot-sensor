@@ -29,8 +29,14 @@ DC="docker compose"; [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null && DC="s
 # Genera node_id (UUID) + par ed25519 propio (privada local, nunca viaja) +
 # código de enrolamiento. Independiente del host_key. Idempotente.
 _ensure_identity() {
-  [ -f "$IDDIR/id" ] && { _fix_identity_perms; return 0; }
   mkdir -p "$IDDIR"
+  # Llave secreta del nodo (auto-generada, NUNCA editada a mano). Idempotente; se crea
+  # también para nodos que ya tenían identidad (al actualizar). Autentica al nodo (X-Node-Key).
+  if [ ! -f "$IDDIR/node_key" ]; then
+    (python3 -c "import secrets;print(secrets.token_urlsafe(24))" 2>/dev/null \
+      || head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n') > "$IDDIR/node_key"
+  fi
+  [ -f "$IDDIR/id" ] && { _fix_identity_perms; return 0; }
   local nid
   nid=$(cat /proc/sys/kernel/random/uuid 2>/dev/null \
         || python3 -c 'import uuid;print(uuid.uuid4())' 2>/dev/null)
@@ -48,7 +54,9 @@ _ensure_identity() {
 # deben ser legibles para que el sensor cargue su node_id. La clave privada sigue 600.
 _fix_identity_perms() {
   chmod 755 "$IDDIR" 2>/dev/null
-  chmod 644 "$IDDIR/id" "$IDDIR/enroll_code" "$IDDIR/key.pub" 2>/dev/null
+  # node_key 644 (no 600): el contenedor corre como usuario no-root y debe leerla;
+  # protegida al nivel del host (acceso local al nodo = control del nodo).
+  chmod 644 "$IDDIR/id" "$IDDIR/enroll_code" "$IDDIR/key.pub" "$IDDIR/node_key" 2>/dev/null
   chmod 600 "$IDDIR/key" 2>/dev/null
 }
 _node_id()     { [ -f "$IDDIR/id" ] && cat "$IDDIR/id"; }

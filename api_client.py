@@ -19,7 +19,7 @@ class ShellAPIClient:
     """
 
     def __init__(self, base_url: str, api_key: str, timeout: float = 15.0,
-                 node_id: str = None, sensor_version: str = ""):
+                 node_id: str = None, sensor_version: str = "", node_key: str = ""):
         self._base = base_url.rstrip("/")
         self._node_id = node_id or None
         self._sensor_version = sensor_version or ""
@@ -27,6 +27,9 @@ class ShellAPIClient:
             "X-API-Key": api_key,
             "Content-Type": "application/json",
         }
+        # Llave secreta del nodo: autentica al nodo ante el central (impide suplantarlo).
+        if node_key:
+            self._headers["X-Node-Key"] = node_key
         self._client = httpx.AsyncClient(timeout=timeout)
 
     async def aclose(self):
