@@ -73,6 +73,23 @@ Desde el directorio de instalación (`/opt/ciphersentry` por defecto):
 | `bash node.sh logs` | Actividad en tiempo real |
 | `bash node.sh enroll` | Código para vincular este nodo a tu cuenta |
 | `bash node.sh test` | Probar la conexión a la Shell API |
+| `bash node.sh update` | Actualizar a la última versión y reconstruir |
+
+---
+
+## Actualizar la sonda
+
+```bash
+bash node.sh update
+```
+
+Descarga la **última versión publicada**, reconstruye el contenedor y **conserva tu `config.yaml`,
+tu identidad de nodo y tus logs**. No hay pasos manuales.
+
+> El estado que se imprime al terminar lo dibuja la versión anterior; **vuelve a ejecutar `bash node.sh`**
+> para verlo ya con la versión nueva.
+
+![CipherSentry — bash node.sh update](docs/update-mock.png)
 
 ---
 
