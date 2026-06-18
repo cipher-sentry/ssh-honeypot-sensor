@@ -23,6 +23,9 @@ C_CY='\033[1;36m'; C_GR='\033[1;32m'; C_YE='\033[1;33m'; C_RE='\033[1;31m'
 C_DIM='\033[0;90m'; C_BD='\033[1m'; C_NC='\033[0m'
 LOG="$SCRIPT_DIR/logs/sessions.jsonl"
 IDDIR="$SCRIPT_DIR/node_identity"
+# Respaldo estable de la identidad, FUERA del directorio de instalación, para que el nodo
+# conserve su DNI (node_id/código) aunque se reinstale en un directorio nuevo.
+IDBACKUP="${CIPHERSENTRY_IDENTITY_HOME:-$HOME/.ciphersentry}/node_identity"
 DC="docker compose"; [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null && DC="sudo docker compose"
 
 # ── Identidad del nodo (Sprint 005 · Fase 0) ─────────────────────────────────
@@ -30,13 +33,19 @@ DC="docker compose"; [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null && DC="s
 # código de enrolamiento. Independiente del host_key. Idempotente.
 _ensure_identity() {
   mkdir -p "$IDDIR"
+  # Si este directorio es nuevo pero existe un respaldo estable de una instalación previa,
+  # RESTAURA la identidad → el nodo conserva su mismo DNI tras reinstalar (no hay que
+  # volver a enrolar ni se parte el histórico).
+  if [ ! -f "$IDDIR/id" ] && [ -f "$IDBACKUP/id" ]; then
+    cp -a "$IDBACKUP/." "$IDDIR/" 2>/dev/null && printf "  ${C_GR}✓${C_NC} Identidad anterior restaurada (mismo nodo).\n" || true
+  fi
   # Llave secreta del nodo (auto-generada, NUNCA editada a mano). Idempotente; se crea
   # también para nodos que ya tenían identidad (al actualizar). Autentica al nodo (X-Node-Key).
   if [ ! -f "$IDDIR/node_key" ]; then
     (python3 -c "import secrets;print(secrets.token_urlsafe(24))" 2>/dev/null \
       || head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n') > "$IDDIR/node_key"
   fi
-  [ -f "$IDDIR/id" ] && { _fix_identity_perms; return 0; }
+  if [ -f "$IDDIR/id" ]; then _fix_identity_perms; _backup_identity; return 0; fi
   local nid
   nid=$(cat /proc/sys/kernel/random/uuid 2>/dev/null \
         || python3 -c 'import uuid;print(uuid.uuid4())' 2>/dev/null)
@@ -47,6 +56,15 @@ _ensure_identity() {
   host=$(hostname 2>/dev/null | tr 'a-z' 'A-Z' | tr -cd 'A-Z0-9' | cut -c1-8)
   printf '%s-%s-%s-%s\n' "${host:-NODE}" "${hx:0:4}" "${hx:4:4}" "${hx:8:4}" > "$IDDIR/enroll_code"
   _fix_identity_perms
+  _backup_identity
+}
+
+# Copia la identidad al respaldo estable (fuera del dir de instalación). Idempotente.
+_backup_identity() {
+  [ -f "$IDDIR/id" ] || return 0
+  mkdir -p "$IDBACKUP" 2>/dev/null || return 0
+  cp -a "$IDDIR/." "$IDBACKUP/" 2>/dev/null || true
+  chmod 700 "$(dirname "$IDBACKUP")" "$IDBACKUP" 2>/dev/null || true
 }
 
 # El contenedor corre como usuario NO-root (honeypot) y monta node_identity en :ro.
