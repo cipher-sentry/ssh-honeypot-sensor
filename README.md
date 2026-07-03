@@ -12,7 +12,7 @@ Open-source SSH honeypot that turns attacker connections into actionable intelli
 
 ## The Swarm — distributed sensor network
 
-![The Swarm — distributed sensor network](docs/enjambre.png)
+![The Swarm — distributed sensor network](docs/swarm.png)
 
 Install the sensor on any server or VPS with a single command, and deploy as many nodes as you want — a living network of sensors, each beating toward one center. Every node stays visible and manageable from a single dashboard, and intelligence aggregates automatically: the more nodes, the more signal.
 
