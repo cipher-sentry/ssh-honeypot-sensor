@@ -97,7 +97,7 @@ your node identity and your logs**. No manual steps.
 
 ## Dashboard
 
-![CipherSentry Dashboard — illustrative view](docs/dashboard-mock.svg)
+![CipherSentry Dashboard — live attack map (demo)](docs/threatmap.png)
 
 Manage all your nodes, explore sessions, analyze IPs and export intelligence from a single panel.
 
