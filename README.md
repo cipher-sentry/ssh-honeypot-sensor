@@ -1,93 +1,95 @@
 # CipherSentry SSH Honeypot
 
-**Convierte cada ataque en inteligencia.**
+**English** · [Español](README.es.md)
 
-Honeypot SSH de código abierto que convierte conexiones de atacantes en inteligencia accionable: captura credenciales, sesiones y payloads, y los hace creíbles delegando la emulación en la **CipherSentry Shell API**.
+**Turn every attack into intelligence.**
 
-> Este repositorio es el sensor cliente (MIT). El engine de emulación (70+ comandos, VFS Debian 12, pipelines, REPLs) vive en la Shell API — no está incluido aquí.
+Open-source SSH honeypot that turns attacker connections into actionable intelligence: it captures credentials, sessions and payloads, and makes them believable by delegating command emulation to the **CipherSentry Shell API**.
 
----
-
-## El Enjambre — red de sensores distribuidos
-
-![El Enjambre — red de sensores distribuidos](docs/enjambre.png)
-
-Instala el sensor en cualquier servidor o VPS con un comando. Puedes desplegar tantos nodos como quieras — todos quedan visibles y gestionables desde el mismo dashboard. La inteligencia se agrega automáticamente: cuantos más nodos, más señal.
+> This repository is the client sensor (MIT). The emulation engine (70+ commands, Debian 12 VFS, pipelines, REPLs) lives in the Shell API — it is **not** included here.
 
 ---
 
-## Despliegue rápido
+## The Swarm — distributed sensor network
 
-![Instalación CipherSentry](docs/terminal-install.png)
+![The Swarm — distributed sensor network](docs/enjambre.png)
+
+Install the sensor on any server or VPS with a single command, and deploy as many nodes as you want — a living network of sensors, each beating toward one center. Every node stays visible and manageable from a single dashboard, and intelligence aggregates automatically: the more nodes, the more signal.
+
+---
+
+## Quick deploy
+
+![CipherSentry install](docs/terminal-install.png)
 
 ```bash
 curl -fsSL https://ciphersentry.yoire.com/install.sh | bash
 ```
 
-### Opciones del instalador
+### Installer options
 
-| Opción | Descripción | Default |
+| Option | Description | Default |
 |--------|-------------|---------|
-| `--key <api_key>` | Vincula el nodo a tu cuenta desde el primer momento | *modo anónimo* |
-| `--dir <ruta>` | Directorio de instalación | `/opt/ciphersentry` |
-| `--port <num>` | Puerto SSH del honeypot | 22 si libre, si no 2222 |
-| `--no-docker` | Omite la instalación de Docker (ya lo tienes) | — |
+| `--key <api_key>` | Link the node to your account from the start | *anonymous mode* |
+| `--dir <path>` | Install directory | `/opt/ciphersentry` |
+| `--port <num>` | Honeypot SSH port | 22 if free, else 2222 |
+| `--no-docker` | Skip Docker install (you already have it) | — |
 
-Ejemplos habituales:
+Common examples:
 
 ```bash
-# Con cuenta vinculada
-curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --key <tu-key>
+# Linked to your account
+curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --key <your-key>
 
-# Docker ya instalado, directorio personalizado
+# Docker already installed, custom directory
 curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- \
   --dir /opt/ciphersentry \
   --no-docker
 
-# Puerto específico (p. ej. en un servidor con SSH real en el 22)
+# Specific port (e.g. on a host with real SSH on 22)
 curl -fsSL https://ciphersentry.yoire.com/install.sh | bash -s -- --port 2222
 ```
 
-**Funciona desde el minuto cero:** el sensor viene preconfigurado con la Shell API de CipherSentry.
+**Works from minute zero:** the sensor ships preconfigured with the CipherSentry Shell API.
 
-**Vincular el nodo a tu cuenta:**
+**Link the node to your account:**
 
 ```bash
-bash node.sh enroll     # imprime tu código (p. ej. NODO-A1B2-C3D4-E5F6)
-# → El Enjambre → Añadir nodo → pega el código
+bash node.sh enroll     # prints your code (e.g. NODO-A1B2-C3D4-E5F6)
+# → The Swarm → Add node → paste the code
 ```
 
-A partir de ahí, todas tus capturas aparecen en tu cuenta.
+From then on, all your captures show up in your account.
 
 ---
 
-## Gestión del nodo
+## Node management
 
-Desde el directorio de instalación (`/opt/ciphersentry` por defecto):
+From the install directory (`/opt/ciphersentry` by default):
 
-| Comando | Acción |
+| Command | Action |
 |---------|--------|
-| `bash node.sh` | Estado: puerto, sesiones capturadas, Shell API alcanzable |
-| `bash node.sh up` | Arrancar el honeypot |
-| `bash node.sh down` | Parar el honeypot |
-| `bash node.sh logs` | Actividad en tiempo real |
-| `bash node.sh enroll` | Código para vincular este nodo a tu cuenta |
-| `bash node.sh test` | Probar la conexión a la Shell API |
-| `bash node.sh update` | Actualizar a la última versión y reconstruir |
+| `bash node.sh` | Status: port, captured sessions, Shell API reachable |
+| `bash node.sh up` | Start the honeypot |
+| `bash node.sh down` | Stop the honeypot |
+| `bash node.sh logs` | Live activity |
+| `bash node.sh enroll` | Code to link this node to your account |
+| `bash node.sh test` | Test the connection to the Shell API |
+| `bash node.sh update` | Update to the latest version and rebuild |
 
 ---
 
-## Actualizar la sonda
+## Updating the sensor
 
 ```bash
 bash node.sh update
 ```
 
-Descarga la **última versión publicada**, reconstruye el contenedor y **conserva tu `config.yaml`,
-tu identidad de nodo y tus logs**. No hay pasos manuales.
+Downloads the **latest published version**, rebuilds the container and **keeps your `config.yaml`,
+your node identity and your logs**. No manual steps.
 
-> El estado que se imprime al terminar lo dibuja la versión anterior; **vuelve a ejecutar `bash node.sh`**
-> para verlo ya con la versión nueva.
+> The status printed at the end is drawn by the previous version; **run `bash node.sh` again**
+> to see it with the new version.
 
 ![CipherSentry — bash node.sh update](docs/update-mock.png)
 
@@ -95,40 +97,42 @@ tu identidad de nodo y tus logs**. No hay pasos manuales.
 
 ## Dashboard
 
-![CipherSentry Dashboard — vista ilustrativa](docs/dashboard-mock.svg)
+![CipherSentry Dashboard — illustrative view](docs/dashboard-mock.svg)
 
-Gestiona todos tus nodos, explora sesiones, analiza IPs y exporta inteligencia desde un único panel.
+Manage all your nodes, explore sessions, analyze IPs and export intelligence from a single panel.
 
 ---
 
-## Planes
+## Plans
 
 |  | **Free** | **Starter** | **Pro** | **Enterprise** |
 |--|----------|-------------|---------|----------------|
-| **Precio** | Gratis | €19/mes | €79/mes | €499/mes |
-| Sesiones de honeypot | ✓ | ✓ | ✓ | ✓ |
-| Comandos emulados/mes | ✓ | ✓ | ✓ | ✓ |
-| Nodos en el enjambre | ✓ | ✓ | ✓ | ✓ |
-| Export de datos (RGPD) | ✓ | ✓ | ✓ | ✓ |
-| Onboarding guiado | — | *próximamente* | *próximamente* | *próximamente* |
-| Inteligencia: IOCs e informes | — | — | *próximamente* | *próximamente* |
-| Detección de campañas | — | — | *próximamente* | *próximamente* |
-| Retención extendida | — | — | *próximamente* | *próximamente* |
-| Seguridad avanzada / on-prem | — | — | — | *próximamente* |
-| Soberanía del dato | — | — | — | *próximamente* |
+| **Price** | Free | €19/mo | €79/mo | €499/mo |
+| Session window | 200 | 2,000 | 20,000 | Unlimited / custom |
+| Emulated commands / mo | 10,000 | 100,000 | 1,000,000 | Unlimited |
+| Swarm nodes | ✓ | ✓ | ✓ | ✓ |
+| Data export (GDPR) | ✓ | ✓ | ✓ | ✓ |
+| Guided onboarding | — | *coming soon* | *coming soon* | *coming soon* |
+| Intelligence: IOCs & reports | — | — | *coming soon* | *coming soon* |
+| Campaign detection | — | — | *coming soon* | *coming soon* |
+| Extended retention | — | — | *coming soon* | *coming soon* |
+| Advanced security / on-prem | — | — | — | *coming soon* |
+| Data sovereignty | — | — | — | *coming soon* |
 
-Sin tarjeta de crédito para empezar · [Ver todos los planes →](https://ciphersentry.yoire.com/planes.html)
+> **Your window** = the last N sessions, always live and rolling. Upgrading widens the window; it never deletes anything.
+
+No credit card to get started · [See all plans →](https://ciphersentry.yoire.com/planes.html)
 
 ---
 
-## Configuración
+## Configuration
 
 ### config.yaml
 
-El nodo viene **preconfigurado** y funciona desde el minuto cero sin tocar nada. Para la mayoría de usos no hace falta editar este fichero — el instalador con `--key` y `node.sh enroll` cubren el resto.
+The node ships **preconfigured** and works from minute zero without touching anything. For most uses you won't need to edit this file — the installer's `--key` and `node.sh enroll` cover the rest.
 
 ```yaml
-# CipherSentry Honeypot Client — configuración
+# CipherSentry Honeypot Client — configuration
 host: "0.0.0.0"
 port: 2222
 host_key_file: "host_key"
@@ -139,111 +143,108 @@ fake_hostname: "web-srv-01"
 log_dir: "logs"
 verbose: false
 
-# Ventana de captura de credenciales: durante [start_minute, end_minute) de cada
-# hora se bloquean los EXEC (comandos sueltos) para registrar credencial + comando
-# sin servirlos. Las sesiones SHELL interactivas se permiten SIEMPRE (son el oro).
+# Credential-capture window: during [start_minute, end_minute) of each hour, EXEC
+# (one-shot commands) are blocked to record credential + command without serving them.
+# Interactive SHELL sessions are ALWAYS allowed (they are the gold).
 credential_capture:
   enabled: true
-  start_minute: 45   # de xx:45
-  end_minute: 60     # a xx:00 (60 = en punto)
+  start_minute: 45   # from xx:45
+  end_minute: 60     # to xx:00 (60 = on the hour)
 
-# Shell API central — preconfigurada, el nodo funciona desde el minuto cero.
-# Sobrescribible con SHELL_API_URL (env o .env).
+# Central Shell API — preconfigured, the node works from minute zero.
+# Overridable with SHELL_API_URL (env or .env).
 shell_api_url: "https://api.ciphersentry.yoire.com"
 
-# URL del panel web (opcional). Si no se indica, node.sh la deriva del api_url.
+# Web panel URL (optional). If omitted, node.sh derives it from api_url.
 # dashboard_url: "https://app.ciphersentry.yoire.com"
 
-# Tu API key de El Enjambre. Cámbiala por la tuya para que las sesiones aparezcan
-# en tu cuenta. Encuéntrala en: El Enjambre → Mi cuenta → API key.
-# Sin cambiarla las sesiones se capturan igualmente pero en modo anónimo.
-# Nota: "free-demo" es una clave compartida y pública — verla aquí es intencional.
+# Your Swarm API key. Change it to yours so sessions show in your account.
+# Find it in: The Swarm → My account → API key.
+# Without changing it, sessions are still captured but in anonymous mode.
+# Note: "free-demo" is a shared, public key — seeing it here is intentional.
 shell_api_key: "free-demo"
 ```
 
-### Ventana de captura de credenciales
+### Credential-capture window
 
-Durante `[start_minute, end_minute)` de cada hora, el honeypot **bloquea los
-comandos no interactivos (EXEC, `ssh host "cmd"`)**: registra la credencial y el
-comando intentado en un evento `exec_blocked`, pero **no** lo ejecuta. Esto fuerza
-a los bots a seguir probando credenciales. Las **sesiones SHELL interactivas se
-permiten siempre a la primera** — son las más valiosas y nunca se bloquean.
-Fuera de la ventana, los EXEC se ejecutan con normalidad.
+During `[start_minute, end_minute)` of each hour, the honeypot **blocks non-interactive
+commands (EXEC, `ssh host "cmd"`)**: it records the credential and the attempted command
+in an `exec_blocked` event, but does **not** run it. This nudges bots to keep trying
+credentials. **Interactive SHELL sessions are always allowed on the first try** — they
+are the most valuable and are never blocked. Outside the window, EXEC runs normally.
 
-### Variables de entorno
+### Environment variables
 
-| Variable | Descripción | Default |
+| Variable | Description | Default |
 |----------|-------------|---------|
-| `HONEYPOT_PORT` | Puerto SSH | `2222` |
-| `SHELL_API_URL` | URL de la Shell API | `https://api.ciphersentry.yoire.com` |
-| `SHELL_API_KEY` | API key para la Shell API | `free-demo` |
-| `NODE_ID` | Identidad del nodo (granularidad por nodo en El Enjambre) | `node_identity/id` |
-| `HONEYPOT_VERBOSE` | Log detallado (`1`/`0`) | `0` |
+| `HONEYPOT_PORT` | SSH port | `2222` |
+| `SHELL_API_URL` | Shell API URL | `https://api.ciphersentry.yoire.com` |
+| `SHELL_API_KEY` | API key for the Shell API | `free-demo` |
+| `NODE_ID` | Node identity (per-node granularity in The Swarm) | `node_identity/id` |
+| `HONEYPOT_VERBOSE` | Verbose log (`1`/`0`) | `0` |
 
-Las variables de entorno tienen prioridad sobre `config.yaml`.
+Environment variables take precedence over `config.yaml`.
 
-**`NODE_ID`** — identidad del nodo que se envía a la Shell API en cada sesión para que
-la actividad se contabilice **por nodo** (no solo por cuenta). Si no se define, se lee
-automáticamente de `node_identity/id` (generado por `node.sh`). Con Docker, monta
-`./node_identity` (ya incluido en `docker-compose.yml`) o pasa `NODE_ID` por `.env`.
+**`NODE_ID`** — the node identity sent to the Shell API on every session so activity is
+counted **per node** (not just per account). If unset, it is read automatically from
+`node_identity/id` (generated by `node.sh`). With Docker, mount `./node_identity`
+(already included in `docker-compose.yml`) or pass `NODE_ID` via `.env`.
 
 ---
 
 ## Shell API
 
-Este honeypot requiere una instancia de **CipherSentry Shell API** para funcionar. Sin ella, no puede emular comandos.
+This honeypot requires a **CipherSentry Shell API** instance to work. Without it, it cannot emulate commands.
 
-Más información: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
+More info: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
 
 ---
 
 ## Logs
 
-Cada evento se registra en `logs/sessions.jsonl` en formato JSON Lines, compatible con el dashboard de CipherSentry. Si el nodo tiene `node_id`, **todos** los eventos lo llevan (incluidos los previos a la sesión como `probe` y `connection`), para que el panel pueda atribuir toda la actividad al nodo.
+Every event is logged to `logs/sessions.jsonl` in JSON Lines format, compatible with the CipherSentry dashboard. If the node has a `node_id`, **all** events carry it (including pre-session ones like `probe` and `connection`), so the panel can attribute all activity to the node.
 
-Tipos de evento: `connection`, `credential_probe`, `probe`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, y los eventos SFTP: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
+Event types: `connection`, `credential_probe`, `probe`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, and the SFTP events: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
 
 ---
 
 ## SFTP
 
-El honeypot implementa el subsistema **SFTP/SCP**, así que clientes en modo
-"Files" (p. ej. Termius) pueden conectar y navegar sin error. Cada sesión SFTP
-opera en un **sandbox temporal aislado** (chroot) sembrado con un árbol Debian 12
-creíble; nada toca el filesystem real del host ni otras sesiones.
+The honeypot implements the **SFTP/SCP** subsystem, so clients in "Files" mode (e.g. Termius)
+can connect and browse without errors. Each SFTP session runs in an **isolated temporary
+sandbox** (chroot) seeded with a believable Debian 12 tree; nothing touches the host's real
+filesystem or other sessions.
 
-**Captura de uploads a prueba de borrado.** Cuando un atacante sube un fichero, sus
-bytes se copian **en el momento de la escritura** a una cuarentena separada del
-sandbox:
+**Deletion-proof upload capture.** When an attacker uploads a file, its bytes are copied
+**at write time** to a quarantine separate from the sandbox:
 
 ```
-logs/sftp_uploads/<session_id>/<timestamp>_<uniq>_<nombre>
+logs/sftp_uploads/<session_id>/<timestamp>_<uniq>_<name>
 ```
 
-- El fichero capturado **se conserva aunque el atacante lo borre o renombre**
-  después (un dropper que se ejecuta y se autoelimina queda igualmente guardado).
-- Se conserva **cada versión** subida, no solo la última.
-- Cada upload registra un evento `sftp_upload` con `path`, `size`, `sha256` y la
-  ruta de cuarentena. Los borrados quedan como `sftp_delete` (evidencia de tapado
-  de huellas).
-- **Nada de lo subido se ejecuta jamás** — se almacena como dato inerte.
+- The captured file **is kept even if the attacker deletes or renames it** afterwards
+  (a dropper that runs and self-deletes is stored all the same).
+- **Every version** uploaded is kept, not just the last one.
+- Each upload records an `sftp_upload` event with `path`, `size`, `sha256` and the
+  quarantine path. Deletions are logged as `sftp_delete` (evidence of track-covering).
+- **Nothing uploaded is ever executed** — it is stored as inert data.
 
-La cuarentena vive bajo `logs/` (no se sube a git; no se expone por SFTP).
+The quarantine lives under `logs/` (not committed to git; not exposed over SFTP).
 
 ---
 
-## Compatibilidad con clientes SSH
+## SSH client compatibility
 
-Probado con OpenSSH y con clientes móviles. La compatibilidad con **Termius (Android, libssh2)**
-requirió varios ajustes en el manejo de asyncssh. Puntos clave:
+Tested with OpenSSH and mobile clients. Compatibility with **Termius (Android, libssh2)**
+required several tweaks to the asyncssh handling. Key points:
 
-- `keyboard-interactive` deshabilitado (asyncssh lo anuncia por defecto sin handler).
-- `ssh_version` sin prefijo `SSH-2.0-` (asyncssh ya lo añade).
-- Los *window-change* del cliente se entregan como excepción `TerminalSizeChanged` en stdin
-  y deben ignorarse, no tratarse como fin de sesión.
+- `keyboard-interactive` disabled (asyncssh advertises it by default without a handler).
+- `ssh_version` without the `SSH-2.0-` prefix (asyncssh adds it already).
+- Client *window-change* requests arrive as a `TerminalSizeChanged` exception on stdin
+  and must be ignored, not treated as end of session.
 
 ---
 
-## Licencia
+## License
 
-MIT — © CipherSentry S.L.
+MIT — © 2026 CipherSentry
