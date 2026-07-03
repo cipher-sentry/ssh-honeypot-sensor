@@ -158,15 +158,12 @@ credential_capture:
 # Central Shell API — preconfigured, the node works from minute zero.
 # Overridable with SHELL_API_URL (env or .env).
 shell_api_url: "https://api.ciphersentry.yoire.com"
-
-# Web panel URL (optional). If omitted, node.sh derives it from api_url.
-# dashboard_url: "https://app.ciphersentry.yoire.com"
-
-# Your Swarm API key. Change it to yours so sessions show in your account.
-# Find it in: The Swarm → My account → API key.
-# Without changing it, sessions are still captured but in anonymous mode.
-# Note: "free-demo" is a shared, public key — seeing it here is intentional.
-shell_api_key: "free-demo"
+# Web panel (for the enrollment link). Overridable with DASHBOARD_URL.
+dashboard_url: "https://app.ciphersentry.yoire.com"
+# NOTE: your node's identity and its account/plan are determined by the `node_id`
+# (enroll it with `node.sh enroll` → paste the code in The Swarm). You do NOT need to
+# configure any per-account API key. API access uses a shared transport key
+# (SHELL_API_KEY, default `free-demo`) — not your credential, and it doesn't set your tier.
 ```
 
 ### Credential-capture window
@@ -208,7 +205,7 @@ More info: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
 
 Every event is logged to `logs/sessions.jsonl` in JSON Lines format, compatible with the CipherSentry dashboard. If the node has a `node_id`, **all** events carry it (including pre-session ones like `probe` and `connection`), so the panel can attribute all activity to the node.
 
-Event types: `connection`, `credential_probe`, `probe`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, and the SFTP events: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
+Event types: `connection`, `credential_probe`, `probe`, `command`, `output`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, and the SFTP events: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
 
 ---
 

@@ -155,18 +155,15 @@ credential_capture:
   start_minute: 45   # de xx:45
   end_minute: 60     # a xx:00 (60 = en punto)
 
-# Shell API central — preconfigurada, el nodo funciona desde el minuto cero.
+# Shell API central preconfigurada — el nodo funciona desde el minuto cero.
 # Sobrescribible con SHELL_API_URL (env o .env).
 shell_api_url: "https://api.ciphersentry.yoire.com"
-
-# URL del panel web (opcional). Si no se indica, node.sh la deriva del api_url.
-# dashboard_url: "https://app.ciphersentry.yoire.com"
-
-# Tu API key de El Enjambre. Cámbiala por la tuya para que las sesiones aparezcan
-# en tu cuenta. Encuéntrala en: El Enjambre → Mi cuenta → API key.
-# Sin cambiarla las sesiones se capturan igualmente pero en modo anónimo.
-# Nota: "free-demo" es una clave compartida y pública — verla aquí es intencional.
-shell_api_key: "free-demo"
+# Panel web (para el enlace de enrolamiento). Sobrescribible con DASHBOARD_URL.
+dashboard_url: "https://app.ciphersentry.yoire.com"
+# NOTA: la identidad de tu nodo y su cuenta/plan se determinan por el `node_id`
+# (lo enrolas con `node.sh enroll` → pegas el código en El Enjambre). NO hace falta
+# configurar ninguna API key por cuenta. El acceso a la API usa una key de transporte
+# compartida (SHELL_API_KEY, por defecto `free-demo`); no es tu credencial ni fija tu tier.
 ```
 
 ### Ventana de captura de credenciales
@@ -209,7 +206,7 @@ Más información: [ciphersentry.yoire.com](https://ciphersentry.yoire.com/)
 
 Cada evento se registra en `logs/sessions.jsonl` en formato JSON Lines, compatible con el dashboard de CipherSentry. Si el nodo tiene `node_id`, **todos** los eventos lo llevan (incluidos los previos a la sesión como `probe` y `connection`), para que el panel pueda atribuir toda la actividad al nodo.
 
-Tipos de evento: `connection`, `credential_probe`, `probe`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, y los eventos SFTP: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
+Tipos de evento: `connection`, `credential_probe`, `probe`, `command`, `output`, `exec_blocked`, `channel_fingerprint`, `disconnect`, `privilege_escalation`, y los eventos SFTP: `sftp_session`, `sftp_upload`, `sftp_download`, `sftp_list`, `sftp_delete`.
 
 ---
 
