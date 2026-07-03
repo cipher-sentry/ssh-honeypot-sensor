@@ -105,21 +105,25 @@ Manage all your nodes, explore sessions, analyze IPs and export intelligence fro
 
 ## Plans
 
-|  | **Free** | **Starter** | **Pro** | **Enterprise** |
-|--|----------|-------------|---------|----------------|
-| **Price** | Free | €19/mo | €79/mo | €499/mo |
-| Session window | 200 | 2,000 | 20,000 | Unlimited / custom |
-| Emulated commands / mo | 10,000 | 100,000 | 1,000,000 | Unlimited |
-| Swarm nodes | ✓ | ✓ | ✓ | ✓ |
-| Data export (GDPR) | ✓ | ✓ | ✓ | ✓ |
-| Guided onboarding | — | *coming soon* | *coming soon* | *coming soon* |
-| Intelligence: IOCs & reports | — | — | *coming soon* | *coming soon* |
-| Campaign detection | — | — | *coming soon* | *coming soon* |
-| Extended retention | — | — | *coming soon* | *coming soon* |
-| Advanced security / on-prem | — | — | — | *coming soon* |
-| Data sovereignty | — | — | — | *coming soon* |
+The open-source SSH client is always free. Plans meter usage of the **Shell API** — the private engine that emulates every session.
 
-> **Your window** = the last N sessions, always live and rolling. Upgrading widens the window; it never deletes anything.
+| Capability | **Free** | **Starter** | **Pro** | **Enterprise** |
+|------------|----------|-------------|---------|----------------|
+| **Price** | €0 / forever | €19/mo | €79/mo | €499+/mo |
+| Open-source SSH client (MIT) · Debian 12 emulation · per-session VFS | ✓ | ✓ | ✓ | ✓ |
+| Credential-capture window · JSON Lines logs | ✓ | ✓ | ✓ | ✓ |
+| Commands | No limit | No limit | No limit | No limit |
+| Session window (last N sessions) | 200 | 2,000 | 20,000 | No limit |
+| Swarm nodes | 1 | 3 | 10 | No limit |
+| Accessible history | Your window | Your window | Your window | Custom |
+| Per-IP analysis of your sessions | — | ✓ | ✓ | ✓ |
+| Consolidated intelligence report | — | ✓ | ✓ | ✓ |
+| IOC export via API (threat feed) | — | — | ✓ | ✓ |
+| Shared multitenant Shell API | ✓ | ✓ | ✓ | — |
+| Dedicated isolated instance (on demand) | — | — | — | In preparation |
+| Priority support | — | — | Email | Dedicated channel |
+
+> **Your window** = the last N sessions, always live and rolling. **No command limit.** Upgrading widens the window; it never deletes anything.
 
 No credit card to get started · [See all plans →](https://ciphersentry.yoire.com/planes.html)
 

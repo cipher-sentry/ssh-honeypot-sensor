@@ -105,21 +105,25 @@ Gestiona todos tus nodos, explora sesiones, analiza IPs y exporta inteligencia d
 
 ## Planes
 
-|  | **Free** | **Starter** | **Pro** | **Enterprise** |
-|--|----------|-------------|---------|----------------|
-| **Precio** | Gratis | €19/mes | €79/mes | €499/mes |
-| Ventana de sesiones | 200 | 2.000 | 20.000 | Ilimitada / a medida |
-| Comandos emulados/mes | 10.000 | 100.000 | 1.000.000 | Ilimitados |
-| Nodos en el enjambre | ✓ | ✓ | ✓ | ✓ |
-| Export de datos (RGPD) | ✓ | ✓ | ✓ | ✓ |
-| Onboarding guiado | — | *próximamente* | *próximamente* | *próximamente* |
-| Inteligencia: IOCs e informes | — | — | *próximamente* | *próximamente* |
-| Detección de campañas | — | — | *próximamente* | *próximamente* |
-| Retención extendida | — | — | *próximamente* | *próximamente* |
-| Seguridad avanzada / on-prem | — | — | — | *próximamente* |
-| Soberanía del dato | — | — | — | *próximamente* |
+El cliente SSH open source es siempre gratis. Los planes miden el uso de la **Shell API** — el engine privado que emula cada sesión.
 
-> **Tu ventana** = las últimas N sesiones, siempre en vivo y deslizante. Subir de plan ensancha la ventana; nunca borra nada.
+| Capacidad | **Free** | **Starter** | **Pro** | **Enterprise** |
+|-----------|----------|-------------|---------|----------------|
+| **Precio** | €0 / siempre | €19/mes | €79/mes | €499+/mes |
+| Cliente SSH open source (MIT) · Emulación Debian 12 · VFS por sesión | ✓ | ✓ | ✓ | ✓ |
+| Ventana de captura de credenciales · Logs JSON Lines | ✓ | ✓ | ✓ | ✓ |
+| Comandos | Sin límite | Sin límite | Sin límite | Sin límite |
+| Ventana · últimas sesiones | 200 | 2.000 | 20.000 | Sin límite |
+| Nodos del Enjambre | 1 | 3 | 10 | Sin límite |
+| Histórico accesible | Tu ventana | Tu ventana | Tu ventana | Personalizada |
+| Análisis por IP de tus sesiones | — | ✓ | ✓ | ✓ |
+| Informe de inteligencia consolidado | — | ✓ | ✓ | ✓ |
+| Exportación de IOCs vía API (threat feed) | — | — | ✓ | ✓ |
+| Shell API multitenant compartida | ✓ | ✓ | ✓ | — |
+| Instancia dedicada y aislada (bajo demanda) | — | — | — | En preparación |
+| Soporte prioritario | — | — | Email | Canal dedicado |
+
+> **Tu ventana** = las últimas N sesiones, siempre en vivo y deslizante. **Sin límite de comandos.** Subir de plan ensancha la ventana; nunca borra nada.
 
 Sin tarjeta de crédito para empezar · [Ver todos los planes →](https://ciphersentry.yoire.com/planes.html)
 
