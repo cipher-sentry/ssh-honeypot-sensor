@@ -2,6 +2,8 @@
 
 **English** · [Español](README.es.md)
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Release](https://img.shields.io/github/v/release/cipher-sentry/ssh-honeypot-sensor)](https://github.com/cipher-sentry/ssh-honeypot-sensor/releases) ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+
 **Turn every attack into intelligence.**
 
 Open-source SSH honeypot that turns attacker connections into actionable intelligence: it captures credentials, sessions and payloads, and makes them believable by delegating command emulation to the **CipherSentry Shell API**.
