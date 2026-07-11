@@ -244,8 +244,9 @@ async def run_shell(process: asyncssh.SSHServerProcess,
     if exec_cmd is not None:
         # EXEC no interactivo (`ssh host "cmd"`): se EMULA siempre y se devuelve la salida, como un
         # servidor real. Antes, en la ventana de captura (_cap_mode) se bloqueaba (exec_blocked +
-        # desconexión) → "no devuelve nada", un tell de honeypot. La credencial ya queda registrada en
-        # `connection` y el comando lo captura el engine al ejecutarlo, así que la intel NO se pierde.
+        # desconexión) → "no devuelve nada", un tell de honeypot. La credencial ya
+        # quedó registrada en `connection` y el comando lo captura el engine al ejecutarlo, así que la
+        # intel NO se pierde por emular. (Decisión CEO 2026-07-11.)
         try:
             res = await api.exec_command(api_session_id, exec_cmd)
             if res.get("stdout"):
@@ -502,15 +503,30 @@ class HoneypotSSHServer(asyncssh.SSHServer):
 # ─── create_server ────────────────────────────────────────────────────────────
 
 async def create_server(config: Config, logger: AuditLogger, api: ShellAPIClient):
-    key_file = config.host_key_file
-    if os.path.exists(key_file):
-        server_host_keys = [key_file]
+    # Claves de host: ed25519 (persistente, fingerprint estable) + RSA + ECDSA, como un
+    # OpenSSH real. (ofrecer un único tipo de host key delataba asyncssh.) La
+    # ed25519 se lee/escribe en disco; RSA/ECDSA se generan EN MEMORIA (no requieren
+    # escribir: el dir de la app puede ser de solo lectura para el runtime). Defensivo:
+    # si algo falla, se cae a la ed25519 sola para NO impedir el arranque.
+    kf = config.host_key_file
+    server_host_keys = []
+    if os.path.exists(kf):
+        server_host_keys.append(kf)
     else:
-        logger.logger.info(f"Generating host key → {key_file}")
-        key = asyncssh.generate_private_key("ssh-ed25519")
-        key.write_private_key(key_file)
-        key.write_public_key(key_file + ".pub")
-        server_host_keys = [key_file]
+        ed = asyncssh.generate_private_key("ssh-ed25519")
+        try:
+            ed.write_private_key(kf)
+            ed.write_public_key(kf + ".pub")
+            server_host_keys.append(kf)
+        except OSError:
+            server_host_keys.append(ed)  # en memoria si el dir no es escribible
+    # ECDSA en memoria (además de ed25519). NO se añade RSA: asyncssh anuncia para las
+    # claves RSA variantes de firma `ssh-rsa-shaNNN@ssh.com` (propias, no de OpenSSH) que
+    # no se pueden recortar → serían un tell. ed25519+ecdsa es una config OpenSSH plausible.
+    try:
+        server_host_keys.append(asyncssh.generate_private_key("ecdsa-sha2-nistp256"))
+    except Exception as e:  # nunca impedir el arranque por la clave extra
+        logger.logger.warning(f"No se pudo generar host key ECDSA ({e!r})")
 
     def server_factory():
         return HoneypotSSHServer(config, logger, api)
@@ -522,10 +538,25 @@ async def create_server(config: Config, logger: AuditLogger, api: ShellAPIClient
             _shell_started_conns.add(conn_id)
         await run_shell(process, config, logger, api)
 
-    server = await asyncssh.create_server(
-        server_factory,
-        config.host,
-        config.port,
+    # Algoritmos alineados con OpenSSH 9.2. asyncssh anuncia por defecto MACs
+    # `@ssh.com`, `curve448-sha512` y DH group15/17 que OpenSSH NO tiene → huella de
+    # honeypot detectable pre-auth. Restringimos a lo que ofrece un OpenSSH real (usando
+    # solo nombres que asyncssh soporta).
+    OPENSSH_KEX = ("curve25519-sha256", "curve25519-sha256@libssh.org",
+                   "ecdh-sha2-nistp256", "ecdh-sha2-nistp384", "ecdh-sha2-nistp521",
+                   "diffie-hellman-group-exchange-sha256", "diffie-hellman-group16-sha512",
+                   "diffie-hellman-group18-sha512", "diffie-hellman-group14-sha256")
+    OPENSSH_ENC = ("chacha20-poly1305@openssh.com", "aes128-ctr", "aes192-ctr", "aes256-ctr",
+                   "aes128-gcm@openssh.com", "aes256-gcm@openssh.com")
+    OPENSSH_MAC = ("umac-64-etm@openssh.com", "umac-128-etm@openssh.com",
+                   "hmac-sha2-256-etm@openssh.com", "hmac-sha2-512-etm@openssh.com",
+                   "hmac-sha1-etm@openssh.com", "umac-64@openssh.com", "umac-128@openssh.com",
+                   "hmac-sha2-256", "hmac-sha2-512", "hmac-sha1")
+    # Algoritmos de firma para auth de pubkey (server-sig-algs ext-info) como OpenSSH,
+    # sin variantes `ssh-rsa-shaNNN@ssh.com` ni `ssh-rsa`/SHA-1 (tells de asyncssh).
+    OPENSSH_SIG = ("ssh-ed25519", "ecdsa-sha2-nistp256", "rsa-sha2-512", "rsa-sha2-256")
+
+    base_kwargs = dict(
         server_host_keys=server_host_keys,
         process_factory=_run_shell,
         sftp_factory=make_sftp_factory(config, logger),
@@ -537,6 +568,21 @@ async def create_server(config: Config, logger: AuditLogger, api: ShellAPIClient
         encoding="utf-8",
         line_editor=False,
     )
+
+    try:
+        server = await asyncssh.create_server(
+            server_factory, config.host, config.port,
+            kex_algs=OPENSSH_KEX, encryption_algs=OPENSSH_ENC, mac_algs=OPENSSH_MAC,
+            signature_algs=OPENSSH_SIG,
+            **base_kwargs,
+        )
+    except Exception as e:
+        # Si esta versión de asyncssh rechaza algún nombre, NO romper el honeypot:
+        # arrancar con los algoritmos por defecto (huella menos perfecta pero operativo).
+        logger.logger.warning(f"Listas de algoritmos rechazadas ({e!r}); arranco con defaults")
+        server = await asyncssh.create_server(
+            server_factory, config.host, config.port, **base_kwargs,
+        )
 
     logger.logger.info(f"SSH honeypot listening on {config.host}:{config.port}")
     return server
