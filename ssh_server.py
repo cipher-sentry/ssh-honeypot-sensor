@@ -242,20 +242,10 @@ async def run_shell(process: asyncssh.SSHServerProcess,
     current_prompt = sess_data["prompt"]
 
     if exec_cmd is not None:
-        # Ventana de captura: bloqueamos los EXEC para registrar credencial +
-        # comando sin servirlos. Las sesiones SHELL interactivas NO se tocan.
-        if _cap_mode:
-            logger.exec_blocked(session_id, src_ip, username, password, exec_cmd)
-            # El comando NO se ejecuta, pero SÍ se captura en el engine (intel central
-            # con node_id, buscable por el cliente). Un exec_blocked ya no pierde la traza.
-            try:
-                await api.capture_command(api_session_id, exec_cmd)
-            except Exception:
-                pass
-            await api.close_session(api_session_id)
-            logger.disconnect(session_id, time.time() - start_time, "exec_blocked")
-            process.exit(127)
-            return
+        # EXEC no interactivo (`ssh host "cmd"`): se EMULA siempre y se devuelve la salida, como un
+        # servidor real. Antes, en la ventana de captura (_cap_mode) se bloqueaba (exec_blocked +
+        # desconexión) → "no devuelve nada", un tell de honeypot. La credencial ya queda registrada en
+        # `connection` y el comando lo captura el engine al ejecutarlo, así que la intel NO se pierde.
         try:
             res = await api.exec_command(api_session_id, exec_cmd)
             if res.get("stdout"):
